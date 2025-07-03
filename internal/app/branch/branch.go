@@ -51,6 +51,7 @@ func CheckStaleBranches(args []string) (ci.Finding, error) {
 
 	var staleBranches []StaleBranch
 	err = branches.ForEach(func(branch *plumbing.Reference) error {
+		// Branch which the workflow is running on is not considered stale
 		if branch.Name() == currentBranch.Name() {
 			return nil
 		}
