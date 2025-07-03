@@ -108,3 +108,44 @@ RUN mkdir -p /src && chown root:root /src && git config --global --add safe.dire
 WORKDIR /src
 
 RUN chmod 755 /usr/local/go/bin/* && chown root:root /usr/local/go/bin/*
+
+FROM --platform=${BUILDPLATFORM} deps-clean AS build
+
+# Docker buildx ARGs
+ARG TARGETOS
+ARG TARGETARCH
+
+ARG ENABLE_CGO=0
+
+ENV CGO_ENABLED=${ENABLE_CGO} GOOS=${TARGETOS} GOARCH=${TARGETARCH}
+
+RUN --mount=type=secret,id=gitcreds \
+	--mount=type=cache,target=/root/go/pkg \
+	--mount=type=bind,source=./go.mod,target=go.mod \
+	--mount=type=bind,source=./go.sum,target=go.sum \
+	cp /run/secrets/gitcreds /root/.netrc && \
+	go mod download -x
+
+RUN --mount=type=cache,target=/root/go/pkg \
+	--mount=type=cache,target=/root/.cache \
+	--mount=type=bind,source=.,target=. \
+	go build -ldflags='-s -w' -o /usr/local/bin/kema-runner ./cmd/main
+
+FROM --platform=${BUILDPLATFORM} deps-clean AS clean
+ENV HOME=/home/nobody
+
+RUN mkdir -p ${HOME} && chown nobody:nobody ${HOME}
+
+USER nobody:nobody
+
+FROM deps-clean AS dev
+
+RUN go install github.com/air-verse/air@latest
+
+ENTRYPOINT ["air", "-c", "config/air/.air.toml"]
+
+FROM --platform=${BUILDPLATFORM} deps-clean AS runner
+
+COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
+
+ENTRYPOINT ["/usr/local/bin/kema-runner"]
