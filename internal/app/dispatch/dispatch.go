@@ -12,6 +12,7 @@ import (
 	"github.com/kemadev/ci-cd/internal/app/config"
 	"github.com/kemadev/ci-cd/internal/app/lint"
 	"github.com/kemadev/ci-cd/internal/app/pr"
+	"github.com/kemadev/ci-cd/internal/app/repotpl"
 	"github.com/kemadev/ci-cd/pkg/ci"
 	"github.com/kemadev/ci-cd/pkg/filesfind"
 	"github.com/kemadev/ci-cd/pkg/git"
@@ -750,7 +751,26 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return 0, nil
 
-	case "branch-stale":
+	case "repo-template-check-stale":
+		finding, err := repotpl.CheckRepoTemplateUpdate(os.Args)
+		if err != nil {
+			return 1, fmt.Errorf("error checking stale repository template: %w", err)
+		}
+
+		if finding != (ci.Finding{}) {
+			err := ci.PrintFindings([]ci.Finding{finding}, lint.GetOutputFormat())
+			if err != nil {
+				return 1, fmt.Errorf("error printing findings: %w", err)
+			}
+
+			return 1, fmt.Errorf("stale repository template check failed: %s", finding.Message)
+		}
+
+		slog.Debug("stale repository template check passed")
+
+		return 0, nil
+
+	case "branch-check-stale":
 		finding, err := branch.CheckStaleBranches(os.Args)
 		if err != nil {
 			return 1, fmt.Errorf("error checking stale branches: %w", err)
