@@ -3,6 +3,7 @@ package ci
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"slices"
 	"strings"
 )
@@ -13,9 +14,12 @@ var (
 )
 
 func PrintFindings(findings []Finding, format string) error {
+	cwd := os.Getenv("PWD")
+
 	var pfindings []*Finding
 	for i := range findings {
 		pfindings = append(pfindings, &findings[i])
+		pfindings[i].FilePath = strings.TrimPrefix(pfindings[i].FilePath, cwd+"/")
 	}
 
 	err := validateFindings(pfindings)
