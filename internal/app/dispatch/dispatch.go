@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/kemadev/ci-cd/internal/app/branch"
 	"github.com/kemadev/ci-cd/internal/app/config"
 	"github.com/kemadev/ci-cd/internal/app/lint"
 	"github.com/kemadev/ci-cd/internal/app/pr"
@@ -746,6 +747,25 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		}
 
 		slog.Debug("PR title check passed")
+
+		return 0, nil
+
+	case "branch-stale":
+		finding, err := branch.CheckStaleBranches(os.Args)
+		if err != nil {
+			return 1, fmt.Errorf("error checking stale branches: %w", err)
+		}
+
+		if finding != (ci.Finding{}) {
+			err := ci.PrintFindings([]ci.Finding{finding}, lint.GetOutputFormat())
+			if err != nil {
+				return 1, fmt.Errorf("error printing findings: %w", err)
+			}
+
+			return 1, fmt.Errorf("stale branches check failed: %s", finding.Message)
+		}
+
+		slog.Debug("stale branches check passed")
 
 		return 0, nil
 
