@@ -472,7 +472,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return goRc, goErr
 
-	case "lint":
+	case "go-lint":
 		var fixEnabled bool
 		if len(args) > 1 && args[1] == "--fix" {
 			fixEnabled = true
@@ -732,7 +732,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "pr-check-title":
+	case "pr-title-check":
 		finding, err := pr.CheckPRTitle(os.Args)
 		if err != nil {
 			return 1, fmt.Errorf("error checking PR title: %w", err)
@@ -751,8 +751,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return 0, nil
 
-	case "repo-template-check-stale":
-		finding, err := repotpl.CheckRepoTemplateUpdate(os.Args)
+	case "repo-template-stale-check":
+		finding, err := repotpl.CheckRepoTemplateUpdate()
 		if err != nil {
 			return 1, fmt.Errorf("error checking stale repository template: %w", err)
 		}
@@ -770,8 +770,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return 0, nil
 
-	case "branch-check-stale":
-		finding, err := branch.CheckStaleBranches(os.Args)
+	case "branch-stale-check":
+		finding, err := branch.CheckStaleBranches()
 		if err != nil {
 			return 1, fmt.Errorf("error checking stale branches: %w", err)
 		}

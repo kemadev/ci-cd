@@ -24,7 +24,7 @@ var (
 	RepoTemplateUpdateTrackerFile = "config/copier/.copier-answers.yml"
 )
 
-func CheckRepoTemplateUpdate(args []string) (ci.Finding, error) {
+func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	repo, err := kg.GetGitRepo()
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting git repository: %w", err)

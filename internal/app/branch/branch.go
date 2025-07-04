@@ -24,7 +24,7 @@ type StaleBranch struct {
 	LastCommitAuthor string
 }
 
-func CheckStaleBranches(args []string) (ci.Finding, error) {
+func CheckStaleBranches() (ci.Finding, error) {
 	repo, err := git.GetGitRepo()
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting git repository: %w", err)
