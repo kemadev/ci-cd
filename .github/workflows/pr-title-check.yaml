@@ -8,7 +8,6 @@ on:
       - synchronize
       - reopened
       - unlocked
-  workflow_dispatch: {}
 
 permissions:
   contents: none
