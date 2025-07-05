@@ -36,6 +36,8 @@ FROM --platform=${BUILDPLATFORM} docker.io/alpine:${ALPINE_MAJOR_MINOR_PATCH_VER
 RUN apk add --no-cache \
 	libstdc++ \
 	python3 \
+	gcc \
+	musl-dev \
 	bash \
 	curl \
 	jq \
@@ -140,7 +142,15 @@ USER nobody:nobody
 
 FROM deps-clean AS dev
 
+# Docker buildx ARGs
+ARG TARGETOS
+ARG TARGETARCH
+
+ARG ENABLE_CGO=0
+
 RUN go install github.com/air-verse/air@latest
+
+ENV CGO_ENABLED=${ENABLE_CGO} GOOS=${TARGETOS} GOARCH=${TARGETARCH}
 
 ENTRYPOINT ["air", "-c", "config/air/.air.toml"]
 

@@ -371,7 +371,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 	case "go-mod-tidy":
 		slog.Info(fmt.Sprintf("running %s", "go-mod-tidy"))
 		for _, mod := range goModList {
-			slog.Info(fmt.Sprintf("running %s", "go-mod-name"), slog.String("mod", mod))
+			slog.Info(fmt.Sprintf("running %s", "go-mod-tidy"), slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
 				config,
 				lint.LinterArgs{
