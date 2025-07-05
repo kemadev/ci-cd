@@ -28,7 +28,6 @@ jobs:
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
       # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -48,7 +47,6 @@ jobs:
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
       # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -68,7 +66,6 @@ jobs:
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
       # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -88,7 +85,6 @@ jobs:
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
       # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -108,7 +104,6 @@ jobs:
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
       # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
