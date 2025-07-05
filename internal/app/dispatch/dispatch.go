@@ -783,10 +783,10 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				return 1, fmt.Errorf("error printing findings: %w", err)
 			}
 
-			return 1, fmt.Errorf("PR title check failed: %s", finding.Message)
+			return 1, fmt.Errorf("pr title check failed: %s", finding.Message)
 		}
 
-		slog.Debug("PR title check passed")
+		slog.Info("pr title check passed")
 
 		return 0, nil
 
@@ -806,7 +806,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			return 1, fmt.Errorf("stale repository template check failed: %s", finding.Message)
 		}
 
-		slog.Debug("stale repository template check passed")
+		slog.Info("stale repository template check passed")
 
 		return 0, nil
 
@@ -825,7 +825,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			return 1, fmt.Errorf("stale branches check failed: %s", finding.Message)
 		}
 
-		slog.Debug("stale branches check passed")
+		slog.Info("stale branches check passed")
 
 		return 0, nil
 
