@@ -193,17 +193,12 @@ func handleLinterOutcome(
 		// Remove ANSI escape codes from stderr
 		re := regexp.MustCompile(`\x1b\[[0-9;]*m`)
 		cleaned := re.ReplaceAllString(stderrBuf.String(), "")
-		findings = append(findings, ci.Finding{
-			ToolName:  "runtime-error-checker",
-			RuleID:    "no-non-zero-exit-code",
-			Level:     "error",
-			FilePath:  ".",
-			Message:   cleaned,
-			StartLine: 0,
-			EndLine:   0,
-			StartCol:  0,
-			EndCol:    0,
-		})
+		slog.Debug(
+			"command execution failed with error",
+			slog.String("error", cleaned),
+			slog.String("stdout", stdoutBuf.String()),
+			slog.String("stderr", stderrBuf.String()),
+		)
 	} else {
 		slog.Info("command executed successfully")
 	}
