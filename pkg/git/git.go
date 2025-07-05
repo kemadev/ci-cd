@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/caarlos0/svu/pkg/svu"
+	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -81,4 +82,15 @@ func TagSemver() error {
 	slog.Debug("pushed tag", slog.String("tag", ref.Name().Short()))
 
 	return nil
+}
+
+func GetRemoteGitRepo(remoteURL string) (*git.Repository, error) {
+	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
+		URL: "https://github.com/go-git/go-billy",
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error opening git repository: %w", err)
+	}
+
+	return repo, nil
 }
