@@ -8,7 +8,6 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
-	"regexp"
 	"sync"
 
 	"github.com/kemadev/ci-cd/internal/app/config"
@@ -186,19 +185,7 @@ func handleLinterOutcome(
 
 	err := cmd.Wait()
 	if err != nil {
-		slog.Error(
-			"command execution failed",
-			slog.String("error", err.Error()),
-		)
-		// Remove ANSI escape codes from stderr
-		re := regexp.MustCompile(`\x1b\[[0-9;]*m`)
-		cleaned := re.ReplaceAllString(stderrBuf.String(), "")
-		slog.Debug(
-			"command execution failed with error",
-			slog.String("error", cleaned),
-			slog.String("stdout", stdoutBuf.String()),
-			slog.String("stderr", stderrBuf.String()),
-		)
+		slog.Error("command execution failed", slog.String("error", err.Error()))
 	} else {
 		slog.Info("command executed successfully")
 	}
