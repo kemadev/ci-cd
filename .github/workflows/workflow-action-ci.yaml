@@ -33,6 +33,8 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
+      - name: Set git safe directory
+        run: git config --global --add safe.directory ${{ github.workspace }}
       - name: Workflows lint
         id: workflow-lint
         run: kema-runner gha
