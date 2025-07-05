@@ -481,6 +481,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					},
 				})
 
+			slog.Debug("Go mod name check", slog.String("expectedGoModName", expectedGoModName), slog.Int("retCode", retCode))
+
 			if retCode != 0 {
 				goRc = 1
 			}

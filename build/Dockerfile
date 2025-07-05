@@ -70,7 +70,8 @@ RUN pip install --no-cache-dir "semgrep==${SEMGREP_VERSION}"
 
 FROM --platform=${BUILDPLATFORM} nodejs AS nodejs-deps
 
-RUN rm -rf /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/docker-entrypoint.sh
+RUN mkdir /go && \
+	rm -rf /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/docker-entrypoint.sh
 
 FROM --platform=${BUILDPLATFORM} base AS deps-clean
 
