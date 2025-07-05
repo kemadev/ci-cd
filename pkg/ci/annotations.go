@@ -3,6 +3,7 @@ package ci
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"slices"
 	"strings"
@@ -25,6 +26,11 @@ func PrintFindings(findings []Finding, format string) error {
 	err := validateFindings(pfindings)
 	if err != nil {
 		return fmt.Errorf("error validating findings: %w", err)
+	}
+
+	if len(pfindings) == 0 {
+		slog.Info("no finding found")
+		return nil
 	}
 
 	switch format {

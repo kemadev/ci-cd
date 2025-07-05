@@ -157,6 +157,13 @@ func RunLinter(config *config.Config, lintArgs LinterArgs) (int, string, string,
 
 	format := GetOutputFormat()
 
+	slog.Debug("running linter",
+		slog.String("binary", lintArgs.Bin),
+		slog.String("args", fmt.Sprintf("%v", args)),
+		slog.String("format", format),
+		slog.Bool("failOnAtLeastOneFinding", lintArgs.FailOnAtLeastOneFinding),
+	)
+
 	waitGroup, cmd, stdoutBuf, stderrBuf, err := startCmd(config, lintArgs, args)
 	if err != nil {
 		return 1, "", "", fmt.Errorf("error preparing command: %w", err)
@@ -183,7 +190,7 @@ func handleLinterOutcome(
 	if err != nil {
 		slog.Error("command execution failed")
 	} else {
-		slog.Debug("command executed successfully")
+		slog.Info("command executed successfully")
 	}
 
 	retCode := cmd.ProcessState.ExitCode()
