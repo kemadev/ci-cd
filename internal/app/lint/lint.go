@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"regexp"
 	"sync"
 
 	"github.com/kemadev/ci-cd/internal/app/config"
@@ -181,23 +182,40 @@ func handleLinterOutcome(
 	format string,
 	args LinterArgs,
 ) (int, error) {
+	var findings []ci.Finding
+
 	err := cmd.Wait()
 	if err != nil {
-		slog.Error("command execution failed", slog.String("error", err.Error()))
+		slog.Error(
+			"command execution failed",
+			slog.String("error", err.Error()),
+		)
+		// Remove ANSI escape codes from stderr
+		re := regexp.MustCompile(`\x1b\[[0-9;]*m`)
+		cleaned := re.ReplaceAllString(stderrBuf.String(), "")
+		findings = append(findings, ci.Finding{
+			ToolName:  "runtime-error-checker",
+			RuleID:    "no-non-zero-exit-code",
+			Level:     "error",
+			FilePath:  ".",
+			Message:   cleaned,
+			StartLine: 0,
+			EndLine:   0,
+			StartCol:  0,
+			EndCol:    0,
+		})
 	} else {
 		slog.Info("command executed successfully")
 	}
 
 	retCode := cmd.ProcessState.ExitCode()
 
-	var findings []ci.Finding
-
 	if args.JsonInfo.Type == "plain" {
 		if len(stdoutBuf.String()) == 0 {
 			return 0, nil
 		}
 
-		findings = []ci.Finding{{
+		f := ci.Finding{
 			ToolName:  args.JsonInfo.Mappings.ToolName.OverrideValue,
 			RuleID:    args.JsonInfo.Mappings.RuleID.OverrideValue,
 			Level:     args.JsonInfo.Mappings.Level.OverrideValue,
@@ -207,11 +225,15 @@ func handleLinterOutcome(
 			EndLine:   0,
 			StartCol:  0,
 			EndCol:    0,
-		}}
+		}
+		findings = append(findings, f)
 	} else {
-		str := stdoutBuf.String()
+		var str string
+
 		if args.JsonInfo.ReadFromStderr {
 			str = stderrBuf.String()
+		} else {
+			str = stdoutBuf.String()
 		}
 
 		fa, err := ci.FindingsFromJSON(str, args.JsonInfo)
@@ -219,7 +241,7 @@ func handleLinterOutcome(
 			return 1, fmt.Errorf("error parsing findings: %w", err)
 		}
 
-		findings = fa
+		findings = append(findings, fa...)
 	}
 
 	if args.FailOnAtLeastOneFinding && len(findings) > 0 {
