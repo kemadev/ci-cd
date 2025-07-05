@@ -776,6 +776,14 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--clean",
 				},
 			})
+		if rc != 0 {
+			return rc, fmt.Errorf("error running goreleaser, exit code: %d", rc)
+		}
+
+		err = git.PushTag()
+		if err != nil {
+			return 1, fmt.Errorf("error pushing tag: %w", err)
+		}
 
 		return rc, err
 

@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/caarlos0/svu/pkg/svu"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/storage/memory"
 )
 
 var ErrRemoteURLNotFound = fmt.Errorf("remote URL not found")
@@ -74,19 +74,38 @@ func TagSemver() error {
 
 	slog.Info("tag created", slog.String("tag", ref.Name().Short()))
 
-	repo.Push(&git.PushOptions{
+	return nil
+}
+
+func PushTag() error {
+	nextVersion, err := svu.Next()
+	if err != nil {
+		return fmt.Errorf("error getting next version: %w", err)
+	}
+
+	slog.Debug("next version", slog.String("version", nextVersion))
+
+	repo, err := GetGitRepo()
+	if err != nil {
+		return fmt.Errorf("error getting git repository: %w", err)
+	}
+
+	err = repo.Push(&git.PushOptions{
 		RemoteName: "origin",
 		FollowTags: true,
 	})
+	if err != nil {
+		return fmt.Errorf("error pushing tags: %w", err)
+	}
 
-	slog.Debug("pushed tag", slog.String("tag", ref.Name().Short()))
+	slog.Debug("pushed tag")
 
 	return nil
 }
 
 func GetRemoteGitRepo(remoteURL string) (*git.Repository, error) {
 	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
-		URL: "https://github.com/go-git/go-billy",
+		URL: remoteURL,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error opening git repository: %w", err)
