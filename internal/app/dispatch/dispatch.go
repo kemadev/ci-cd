@@ -309,10 +309,13 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						},
 					},
 				})
-			goRc += retCode
+
+			if retCode != 0 {
+				goRc = 1
+			}
 
 			if err != nil {
-				return goRc, fmt.Errorf("error running go test in %s: %w", mod, err)
+				return 1, fmt.Errorf("error running go test in %s: %w", mod, err)
 			}
 		}
 
@@ -367,10 +370,13 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						},
 					},
 				})
-			goRc += retCode
+
+			if retCode != 0 {
+				goRc = 1
+			}
 
 			if err != nil {
-				return goRc, fmt.Errorf("error running go test in %s: %w", mod, err)
+				return 1, fmt.Errorf("error running go test in %s: %w", mod, err)
 			}
 		}
 
@@ -417,10 +423,13 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						},
 					},
 				})
-			goRc += retCode
+
+			if retCode != 0 {
+				goRc = 1
+			}
 
 			if err != nil {
-				return goRc, fmt.Errorf("error running go test in %s: %w", mod, err)
+				return 1, fmt.Errorf("error running go test in %s: %w", mod, err)
 			}
 		}
 
@@ -481,14 +490,12 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					},
 				})
 
-			slog.Debug("Go mod name check", slog.String("expectedGoModName", expectedGoModName), slog.Int("retCode", retCode))
-
 			if retCode != 0 {
 				goRc = 1
 			}
 
 			if err != nil {
-				return goRc, fmt.Errorf("error running go test in %s: %w", mod, err)
+				return 1, fmt.Errorf("error running go test in %s: %w", mod, err)
 			}
 		}
 
