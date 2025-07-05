@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
       - name: Set git safe directory
-        run: git config --global --add safe.directory "/__w/${{ github.repository }}"
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE//\/home\/runner\/work\//\/__w\/}"
       - name: go-release
         id: go-release
         run: |
