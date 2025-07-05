@@ -27,8 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
-      # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
+      env:
+        # Make race detection possible
+        CGO_ENABLED: 1
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -47,8 +48,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
-      # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -67,8 +66,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
-      # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -87,8 +84,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
-      # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -107,8 +102,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
-      # Use runner user, see https://github.com/actions/runner/issues/2033#issuecomment-1598547465
-      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
