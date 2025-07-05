@@ -2,6 +2,7 @@ package branch
 
 import (
 	"fmt"
+	"log/slog"
 	"net/url"
 	"time"
 
@@ -51,6 +52,7 @@ func CheckStaleBranches() (ci.Finding, error) {
 
 	var staleBranches []StaleBranch
 	err = branches.ForEach(func(branch *plumbing.Reference) error {
+		slog.Debug("checking branch", "branch", branch.Name().Short())
 		// Branch which the workflow is running on is not considered stale
 		if branch.Name() == currentBranch.Name() {
 			return nil
