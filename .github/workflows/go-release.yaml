@@ -1,0 +1,36 @@
+name: Go - Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  go-release:
+    name: Go release
+    permissions:
+      contents: write
+      packages: write
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/kemadev/ci-cd-runner:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+    concurrency:
+      group: go-release
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: go-release
+        id: go-release
+        run: |
+          kema-runner release
