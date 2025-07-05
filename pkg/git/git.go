@@ -3,10 +3,12 @@ package git
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"strings"
 
 	"github.com/caarlos0/svu/pkg/svu"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
 )
 
@@ -93,6 +95,10 @@ func PushTag() error {
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "origin",
 		FollowTags: true,
+		Auth:       &http.BasicAuth{
+			Username: "git",
+			Password: os.Getenv("GITHUB_TOKEN"),
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("error pushing tags: %w", err)
