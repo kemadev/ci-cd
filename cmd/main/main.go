@@ -1,56 +1,34 @@
 /*
-ci-cd serves ci-cd microservice.
-It is deployed in Kubernetes and serves over HTTP.
+ci-cd is a wrapper around CI/CD tools.
+
+It provides consitent interface to interact with different tools and platforms, as weall as default
+configuration and settings.
 */
 package main
 
 import (
 	"log/slog"
 	"os"
+	"time"
 
-	"github.com/kemadev/go-framework/pkg/config"
-	"github.com/kemadev/go-framework/pkg/http"
-	"github.com/kemadev/go-framework/pkg/log"
+	"github.com/kemadev/ci-cd/internal/app/config"
+	"github.com/kemadev/ci-cd/internal/app/dispatch"
 )
 
 func main() {
-	// `http.Run()` only returns on init / shutdown failures, where otel logger isn't available
-	fallbackLogger := log.CreateFallbackLogger()
+	startTime := time.Now()
+	config := config.NewConfig()
 
-	// Get app config
-	conf, err := config.NewConfig()
+	retCode, err := dispatch.DispatchCommand(config, os.Args[1:])
 	if err != nil {
-		fallbackLogger.Error(
-			"run",
-			slog.String("Body", "config failure"),
-			// TODO use semconv value once released, see https://opentelemetry.io/docs/specs/semconv/attributes-registry/error/#error-message
-			slog.String("error.message", err.Error()),
-		)
-		os.Exit(1)
+		slog.Error("Error executing command", slog.String("error", err.Error()))
+
+		retCode = 1
 	}
 
+	slog.Debug("Execution time", slog.String("duration", time.Since(startTime).String()))
 
-	// Define routes to handle
-	routes := http.HTTPRoutesToRegister{
-		http.HTTPRoute{
-			Pattern:     "/rolldice/",
-			HandlerFunc: rolldice,
-		},
-		http.HTTPRoute{
-			Pattern:     "/rolldice/{player}",
-			HandlerFunc: rolldice,
-		},
-	}
-
-	// Run HTTP server
-	err = http.Run(routes, conf)
-	if err != nil {
-		fallbackLogger.Error(
-			"run",
-			slog.String("Body", "http failure"),
-			// TODO use semconv value once released, see https://opentelemetry.io/docs/specs/semconv/attributes-registry/error/#error-message
-			slog.String("error.message", err.Error()),
-		)
-		os.Exit(1)
+	if retCode != 0 {
+		os.Exit(retCode)
 	}
 }
