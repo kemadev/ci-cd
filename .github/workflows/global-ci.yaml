@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/kemadev/ci-cd-runner:latest
+      options: --user 1001
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -30,8 +31,6 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-        with:
-          set-safe-directory: ${{ github.workspace }}
       - name: Secrets scan
         id: secrets-scan
         run: kema-runner secrets
