@@ -110,7 +110,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
       - name: Set git safe directory
-        run: git config --global --add safe.directory ${{ github.workspace }}
+        run: git config --global --add safe.directory "/__w/${{ github.repository }}"
       - name: Go lint
         id: go-lint
         run: kema-runner go-lint
