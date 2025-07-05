@@ -253,6 +253,10 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 	case "go-test":
 		slog.Info(fmt.Sprintf("running %s", "go-test"))
 		for _, mod := range goModList {
+			if strings.HasPrefix(mod, filesfind.FilesFindingRootPath+"/deploy/") {
+				slog.Info(fmt.Sprintf("skipping %s", "go-cover"), slog.String("mod", mod))
+				continue
+			}
 			slog.Info(fmt.Sprintf("running %s", "go-test"), slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
 				config,
@@ -317,6 +321,10 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 	case "go-cover":
 		slog.Info(fmt.Sprintf("running %s", "go-cover"))
 		for _, mod := range goModList {
+			if strings.HasPrefix(mod, filesfind.FilesFindingRootPath+"/deploy/") {
+				slog.Info(fmt.Sprintf("skipping %s", "go-cover"), slog.String("mod", mod))
+				continue
+			}
 			slog.Info(fmt.Sprintf("running %s", "go-cover"), slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
 				config,
