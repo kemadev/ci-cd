@@ -30,8 +30,8 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-      - name: DBG
-        run: git config --global --add safe.directory /__w/ci-cd/ci-cd
+        with:
+          set-safe-directory: ${{ github.workspace }}
       - name: Secrets scan
         id: secrets-scan
         run: kema-runner secrets
