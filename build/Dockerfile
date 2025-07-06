@@ -30,7 +30,7 @@ FROM --platform=${BUILDPLATFORM} docker.io/golang:${GO_VERSION}-alpine${ALPINE_M
 FROM --platform=${BUILDPLATFORM} docker.io/node:${NODEJS_VERSION}-alpine${ALPINE_MAJOR_MINOR_VERSION} AS nodejs
 FROM --platform=${BUILDPLATFORM} docker.io/python:${PYTHON_VERSION}-alpine${ALPINE_MAJOR_MINOR_VERSION} AS python
 
-FROM --platform=${BUILDPLATFORM} docker.io/alpine:${ALPINE_MAJOR_MINOR_PATCH_VERSION} AS base
+FROM --platform=${BUILDPLATFORM} docker.io/alpine:${ALPINE_MAJOR_MINOR_PATCH_VERSION} AS base-deps
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache \
@@ -48,7 +48,7 @@ RUN apk add --no-cache \
 	gzip \
 	zip
 
-FROM --platform=${BUILDPLATFORM} base AS misc-deps
+FROM --platform=${BUILDPLATFORM} base-deps AS misc-deps
 
 # Docker buildx ARGs
 ARG TARGETOS
@@ -75,7 +75,7 @@ FROM --platform=${BUILDPLATFORM} nodejs AS nodejs-deps
 RUN mkdir /go && \
 	rm -rf /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/docker-entrypoint.sh
 
-FROM --platform=${BUILDPLATFORM} base AS deps-clean
+FROM --platform=${BUILDPLATFORM} base-deps AS clean-deps
 
 COPY --link --from=hadolint /bin/hadolint /usr/local/bin/hadolint
 COPY --link --from=actionlint /usr/local/bin/actionlint /usr/local/bin/actionlint
@@ -114,7 +114,7 @@ WORKDIR /src
 
 RUN chmod 755 /usr/local/go/bin/* && chown root:root /usr/local/go/bin/*
 
-FROM --platform=${BUILDPLATFORM} deps-clean AS build
+FROM --platform=${BUILDPLATFORM} clean-deps AS base
 
 # Docker buildx ARGs
 ARG TARGETOS
@@ -131,19 +131,21 @@ RUN --mount=type=secret,id=gitcreds \
 	cp /run/secrets/gitcreds /root/.netrc && \
 	go mod download -x
 
+FROM --platform=${BUILDPLATFORM} base AS build
+
 RUN --mount=type=cache,target=/root/go/pkg \
 	--mount=type=cache,target=/root/.cache \
 	--mount=type=bind,source=.,target=. \
 	go build -ldflags='-s -w' -o /usr/local/bin/kema-runner ./cmd/main
 
-FROM --platform=${BUILDPLATFORM} deps-clean AS clean
+FROM --platform=${BUILDPLATFORM} clean-deps AS clean
 ENV HOME=/home/nobody
 
 RUN mkdir -p ${HOME} && chown nobody:nobody ${HOME}
 
 USER nobody:nobody
 
-FROM deps-clean AS dev
+FROM clean-deps AS dev
 
 # Docker buildx ARGs
 ARG TARGETOS
@@ -157,7 +159,7 @@ ENV CGO_ENABLED=${ENABLE_CGO} GOOS=${TARGETOS} GOARCH=${TARGETARCH}
 
 ENTRYPOINT ["air", "-c", "config/air/.air.toml"]
 
-FROM --platform=${BUILDPLATFORM} deps-clean AS runner
+FROM --platform=${BUILDPLATFORM} clean-deps AS runner
 
 LABEL org.opencontainers.image.authors="kemadev"
 LABEL org.opencontainers.image.url="ghcr.io/kemadev/ci-cd"
