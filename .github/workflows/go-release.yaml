@@ -39,12 +39,12 @@ jobs:
       - name: Create git secrets
         shell: bash
         run: |
-          echo -e "machine $(git remote get-url origin | sed -E 's#(https?://)?([^/@:]+).*#\2#')\nlogin git\npassword ${{ secrets.GITHUB_TOKEN }}\n" > "${{ runner.temp }}/gitcreds"
+          echo -e "machine $(git remote get-url origin | sed -E 's#(https?://)?([^/@:]+).*#\2#')\nlogin git\npassword ${{ secrets.GITHUB_TOKEN }}\n" > "./tmp/gitcreds"
       - name: Go release
         id: go-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILDKIT_HOST: tcp://127.0.0.1:1234
-          TEMPDIR: ${{ runner.temp }}
+          TEMPDIR: ./tmp/${{ runner.temp }}
         run: |
           kema-runner release
