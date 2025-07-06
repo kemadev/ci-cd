@@ -119,7 +119,7 @@ sboms:
     artifacts: binary
 
 changelog:
-  format: '{{ .SHA }}: {{ .Message }} ({{ .AuthorName }})'
+  format: '{{ .SHA }}: {{ .Message }}'
   abbrev: 8
   groups:
     - title: Breaking Changes 💥
