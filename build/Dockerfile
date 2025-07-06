@@ -126,8 +126,8 @@ ENV CGO_ENABLED=${ENABLE_CGO} GOOS=${TARGETOS} GOARCH=${TARGETARCH}
 
 RUN --mount=type=secret,id=gitcreds \
 	--mount=type=cache,target=/root/go/pkg \
-	--mount=type=bind,source=./go.mod,target=go.mod \
-	--mount=type=bind,source=./go.sum,target=go.sum \
+	--mount=type=bind,source=go.mod,target=go.mod \
+	--mount=type=bind,source=go.sum,target=go.sum \
 	cp /run/secrets/gitcreds /root/.netrc && \
 	go mod download -x
 
