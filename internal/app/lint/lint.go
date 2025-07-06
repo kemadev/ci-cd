@@ -50,15 +50,13 @@ func processPipe(
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if config.DebugEnabled {
-			_, err := fmt.Fprintln(output, line)
-			if err != nil {
-				slog.Error(
-					"error writing to output",
-					slog.String("line", line),
-					slog.Any("err", err),
-				)
-			}
+		_, err := fmt.Fprintln(output, line)
+		if err != nil {
+			slog.Error(
+				"error writing to output",
+				slog.String("line", line),
+				slog.Any("err", err),
+			)
 		}
 	}
 }
