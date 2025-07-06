@@ -110,6 +110,7 @@ ENV SEMGREP_IN_DOCKER=1
 ENV PYTHONIOENCODING=utf8 PYTHONUNBUFFERED=1
 
 RUN mkdir -p /src && chown root:root /src && git config --global --add safe.directory /src
+
 WORKDIR /src
 
 RUN chmod 755 /usr/local/go/bin/* && chown root:root /usr/local/go/bin/*
@@ -141,6 +142,7 @@ RUN --mount=type=cache,target=/root/go/pkg \
 	go build -ldflags='-s -w' -o /usr/local/bin/kema-runner ./cmd/main
 
 FROM --platform=${BUILDPLATFORM} clean-deps AS clean
+
 ENV HOME=/home/nobody
 
 RUN mkdir -p ${HOME} && chown nobody:nobody ${HOME}
