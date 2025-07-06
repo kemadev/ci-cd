@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/caarlos0/svu/pkg/svu"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/transport/http"
-	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing/transport/http"
+	"github.com/go-git/go-git/v6/storage/memory"
 )
 
 var ErrRemoteURLNotFound = fmt.Errorf("remote URL not found")
@@ -52,7 +52,7 @@ func GetGitBasePathWithRepo(repo *git.Repository) (string, error) {
 }
 
 func TagSemver() error {
-	nextVersion, err := svu.Next()
+	nextVersion, err := svu.Next(svu.ForcePatchIncrement())
 	if err != nil {
 		return fmt.Errorf("error getting next version: %w", err)
 	}
@@ -80,13 +80,6 @@ func TagSemver() error {
 }
 
 func PushTag() error {
-	nextVersion, err := svu.Next()
-	if err != nil {
-		return fmt.Errorf("error getting next version: %w", err)
-	}
-
-	slog.Debug("next version", slog.String("version", nextVersion))
-
 	repo, err := GetGitRepo()
 	if err != nil {
 		return fmt.Errorf("error getting git repository: %w", err)
@@ -95,7 +88,7 @@ func PushTag() error {
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "origin",
 		FollowTags: true,
-		Auth:       &http.BasicAuth{
+		Auth: &http.BasicAuth{
 			Username: "git",
 			Password: os.Getenv("GITHUB_TOKEN"),
 		},
