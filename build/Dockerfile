@@ -134,7 +134,7 @@ RUN --mount=type=secret,id=gitcreds \
 RUN --mount=type=cache,target=/root/go/pkg \
 	--mount=type=cache,target=/root/.cache \
 	--mount=type=bind,source=.,target=. \
-	go build -ldflags='-s -w' -o /usr/local/bin/kema-runner ./cmd/main
+	pwd && ls -Rla && go build -ldflags='-s -w' -o /usr/local/bin/kema-runner ./cmd/main
 
 FROM --platform=${BUILDPLATFORM} deps-clean AS clean
 ENV HOME=/home/nobody
