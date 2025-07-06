@@ -87,7 +87,7 @@ func TagSemver() (bool, error) {
 
 	slog.Info("tag created", slog.String("tag", ref.Name().Short()))
 
-	return true, nil
+	return false, nil
 }
 
 func PushTag() error {
