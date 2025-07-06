@@ -60,6 +60,8 @@ ARG SEMGREP_VERSION=1.119.0
 # hadolint ignore=DL4006
 RUN curl -sSL "https://get.helm.sh/helm-${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz" | tar -xz --strip-components=1 -C /usr/local/bin "${TARGETOS}-${TARGETARCH}/helm"
 
+RUN apk add --no-cache docker
+
 COPY --link --from=nodejs /usr/local /usr/local
 
 RUN npm --cache=false install --global "release-please@${RELEASE_PLEASE_VERSION}" "markdownlint-cli@${MARKDOWNLINT_VERSION}"
