@@ -59,7 +59,7 @@ func TagSemver() (bool, error) {
 
 	slog.Debug("got version", slog.String("current-version", currentVersion))
 
-	nextVersion, err := svu.Next(svu.ForcePatchIncrement())
+	nextVersion, err := svu.Next()
 	if err != nil {
 		return false, fmt.Errorf("error getting next version: %w", err)
 	}

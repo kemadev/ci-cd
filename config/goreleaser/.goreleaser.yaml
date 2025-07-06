@@ -99,13 +99,18 @@ dockers:
     build_flag_templates:
       - '--pull'
       - '--secret=id=gitcreds,src=/tmp/gitcreds'
-      - '--platform=linux/arm64'
+      - '--platform=linux/arm64/v8'
       - '--label=org.opencontainers.image.created={{ .Date }}'
       - '--label=org.opencontainers.image.title={{ .ProjectName }}'
       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
       - '--label=org.opencontainers.image.version={{ .Version }}'
 docker_manifests:
   - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}'
+    image_templates:
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v3'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64-v8.2'
+  - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:latest'
     image_templates:
       - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v3'
       - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
