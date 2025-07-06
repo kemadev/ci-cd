@@ -39,6 +39,7 @@ RUN apk add --no-cache \
 	gcc \
 	musl-dev \
 	docker \
+	buildkit \
 	bash \
 	curl \
 	jq \
