@@ -68,6 +68,6 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-      - name: SAST
+      - name: Static Application Security Testing
         id: sast
         run: kema-runner sast

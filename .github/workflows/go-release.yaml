@@ -32,7 +32,7 @@ jobs:
           fetch-tags: true
       - name: Set git safe directory
         run: git config --global --add safe.directory "${GITHUB_WORKSPACE//\/home\/runner\/work\//\/__w\/}"
-      - name: go-release
+      - name: Go release
         id: go-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -5,8 +5,6 @@ dist: dist/goreleaser
 builds:
   - id: default
     main: ./cmd/main
-    flags:
-      - -buildvcs=true
     ldflags:
       - -s -w
     # asmflags:
@@ -38,17 +36,36 @@ builds:
     mod_timestamp: '{{ .CommitTimestamp }}'
 
 gomod:
-  proxy: false
-  # env:
-  #   - GOPROXY=proxy.golang.org,direct
-  #   - GOSUMDB=sum.golang.org
-  #   - GOPRIVATE=vcs.tld/foo/bar
+  env:
+    - GOPRIVATE=github.com/kemadev/server-bootstrap
   mod: mod
 
 snapshot:
   version_template: '{{ .Version }}-devel-{{ .ShortCommit }}'
 
 report_sizes: true
+
+dockers:
+  - image_templates:
+      - "ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64"
+    use: buildx
+    goos: linux
+    goarch: amd64
+    goamd64: "v4"
+    ids:
+      - default
+    dockerfile: build/Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+docker_manifests:
+  - name_template: "ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64"
 
 archives:
   - id: default
@@ -85,7 +102,7 @@ changelog:
     - title: Bug Fixes 🐛
       regexp: '^.*?bug(\([[:word:]]+\))??!?:.+$'
       order: 400
-    - title: Dependency Updates 📦
+    - title: Dependencies Updates 📦
       regexp: '^.*?chore(\(deps\))??!?:.+$'
       order: 500
     - title: Other Changes 🔄
