@@ -61,7 +61,7 @@ dockers:
       - go.sum
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src={{ .Env.TEMPDIR }}/gitcreds'
+      - '--secret=id=gitcreds,src=/tmp/gitcreds'
       - '--platform=linux/amd64'
       - '--label=org.opencontainers.image.created={{ .Date }}'
       - '--label=org.opencontainers.image.title={{ .ProjectName }}'
