@@ -38,8 +38,12 @@ jobs:
           sleep 5
       - name: Create git secrets
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo -e "machine $(git remote get-url origin | sed -E 's#(https?://)?([^/@:]+).*#\2#')\nlogin git\npassword ${{ secrets.GITHUB_TOKEN }}\n" > "/tmp/gitcreds"
+          echo -e "machine $(git remote get-url origin | sed -E 's#(https?://)?([^/@:]+).*#\2#')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/gitcreds"
+          pwd
+          ls -Rla
       - name: Go release
         id: go-release
         env:
