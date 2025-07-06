@@ -127,7 +127,7 @@ sboms:
   - id: default
     artifacts: binary
     documents:
-      - '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}_{{ if .Arm64 }}v{{ .Arm64 }}{{ end }}{{ if .Amd64 }}v{{ .Amd64 }}{{ end }}.spdx.json'
+      - '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}_{{ if .Arm64 }}{{ .Arm64 }}{{ end }}{{ if .Amd64 }}{{ .Amd64 }}{{ end }}.spdx.json'
 
 changelog:
   format: '{{ .SHA }}: {{ .Message }}'
