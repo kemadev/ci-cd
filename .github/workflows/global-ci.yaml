@@ -22,7 +22,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd-runner:latest
+      image: ghcr.io/kemadev/ci-cd:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -42,7 +42,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd-runner:latest
+      image: ghcr.io/kemadev/ci-cd:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -60,7 +60,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd-runner:latest
+      image: ghcr.io/kemadev/ci-cd:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
