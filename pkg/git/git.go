@@ -67,7 +67,7 @@ func TagSemver() (bool, error) {
 	slog.Debug("got version", slog.String("next-version", nextVersion))
 
 	if currentVersion == nextVersion {
-		return false, nil
+		return true, nil
 	}
 
 	repo, err := GetGitRepo()
