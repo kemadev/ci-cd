@@ -15,14 +15,12 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-      # - darwin
     goarch:
       - amd64
       - arm64
     goamd64:
       # See https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
       - v3
-      - v4
     goarm64:
       # Neoverse N1 / E1 - Cortex A76 (e.g. Raspberry Pi 5)
       - v8.2
@@ -48,11 +46,11 @@ report_sizes: true
 
 dockers:
   - image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v3'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64'
     use: buildx
     goos: linux
     goarch: amd64
-    goamd64: 'v3'
+    goamd64: v3
     ids:
       - default
     dockerfile: build/Dockerfile
@@ -67,30 +65,11 @@ dockers:
       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
       - '--label=org.opencontainers.image.version={{ .Version }}'
   - image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
-    use: buildx
-    goos: linux
-    goarch: amd64
-    goamd64: 'v4'
-    ids:
-      - default
-    dockerfile: build/Dockerfile
-    extra_files:
-      - ./
-    build_flag_templates:
-      - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
-      - '--platform=linux/amd64'
-      - '--label=org.opencontainers.image.created={{ .Date }}'
-      - '--label=org.opencontainers.image.title={{ .ProjectName }}'
-      - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
-      - '--label=org.opencontainers.image.version={{ .Version }}'
-  - image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64-v8.2'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64'
     use: buildx
     goos: linux
     goarch: arm64
-    goarm: 'v8.2'
+    goarm: v8.2
     ids:
       - default
     dockerfile: build/Dockerfile
@@ -107,14 +86,12 @@ dockers:
 docker_manifests:
   - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}'
     image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v3'
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64-v8.2'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64'
   - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:latest'
     image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v3'
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64-v8.2'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64'
 
 archives:
   - id: default
