@@ -48,6 +48,8 @@ dockers:
   - image_templates:
       - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64'
     use: buildx
+    goos: linux
+    goarch: amd64
     ids:
       - default
     dockerfile: build/Dockerfile
@@ -64,6 +66,8 @@ dockers:
   - image_templates:
       - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64'
     use: buildx
+    goos: linux
+    goarch: arm64
     ids:
       - default
     dockerfile: build/Dockerfile
