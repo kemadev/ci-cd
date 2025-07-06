@@ -51,32 +51,43 @@ func GetGitBasePathWithRepo(repo *git.Repository) (string, error) {
 	return basePath, nil
 }
 
-func TagSemver() error {
-	nextVersion, err := svu.Next(svu.ForcePatchIncrement())
+func TagSemver() (bool, error) {
+	currentVersion, err := svu.Current()
 	if err != nil {
-		return fmt.Errorf("error getting next version: %w", err)
+		return false, fmt.Errorf("error getting current version: %w", err)
 	}
 
-	slog.Debug("next version", slog.String("version", nextVersion))
+	slog.Debug("got version", slog.String("current-version", currentVersion))
+
+	nextVersion, err := svu.Next()
+	if err != nil {
+		return false, fmt.Errorf("error getting next version: %w", err)
+	}
+
+	slog.Debug("got version", slog.String("next-version", nextVersion))
+
+	if currentVersion == nextVersion {
+		return false, nil
+	}
 
 	repo, err := GetGitRepo()
 	if err != nil {
-		return fmt.Errorf("error getting git repository: %w", err)
+		return false, fmt.Errorf("error getting git repository: %w", err)
 	}
 
 	head, err := repo.Head()
 	if err != nil {
-		return fmt.Errorf("error getting HEAD reference: %w", err)
+		return false, fmt.Errorf("error getting HEAD reference: %w", err)
 	}
 
 	ref, err := repo.CreateTag(nextVersion, head.Hash(), nil)
 	if err != nil {
-		return fmt.Errorf("error creating tag: %w", err)
+		return false, fmt.Errorf("error creating tag: %w", err)
 	}
 
 	slog.Info("tag created", slog.String("tag", ref.Name().Short()))
 
-	return nil
+	return true, nil
 }
 
 func PushTag() error {

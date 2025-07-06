@@ -758,9 +758,13 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		slog.Info(fmt.Sprintf("running %s", "release"))
 		slog.Info(fmt.Sprintf("running %s", "release"), slog.String("step", "tag-semver"))
 
-		err := git.TagSemver()
+		skip, err := git.TagSemver()
 		if err != nil {
 			return 1, fmt.Errorf("error tagging semver: %w", err)
+		}
+		if skip {
+			slog.Info("skipping release step, no new semver tag created")
+			return 0, nil
 		}
 
 		slog.Info(fmt.Sprintf("running %s", "release"), slog.String("step", "goreleaser"))
