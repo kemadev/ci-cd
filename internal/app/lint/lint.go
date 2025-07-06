@@ -44,7 +44,7 @@ func processPipe(
 
 	reader := io.TeeReader(pipe, buf)
 	scanner := bufio.NewScanner(reader)
-	// Some linters can output a lot of data, in a one-line json format
+	// Some linters can output a lot of data, in a one-line json format, however deadlock can occur if the output line is larger than the buffer size
 	lb := make([]byte, 0, MaxBufferSize)
 	scanner.Buffer(lb, len(lb))
 
