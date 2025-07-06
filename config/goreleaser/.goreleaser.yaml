@@ -57,53 +57,53 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - ./
+      - go.mod
+      - go.sum
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
       - '--platform=linux/amd64'
       - '--label=org.opencontainers.image.created={{ .Date }}'
       - '--label=org.opencontainers.image.title={{ .ProjectName }}'
       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
       - '--label=org.opencontainers.image.version={{ .Version }}'
-  # - image_templates:
-  #     - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
-  #   use: buildx
-  #   goos: linux
-  #   goarch: amd64
-  #   goamd64: 'v4'
-  #   ids:
-  #     - default
-  #   dockerfile: build/Dockerfile
-  #   extra_files:
-  #     - go.mod
-  #     - go.sum
-  #   build_flag_templates:
-  #     - '--pull'
-  #     - '--platform=linux/amd64'
-  #     - '--label=org.opencontainers.image.created={{ .Date }}'
-  #     - '--label=org.opencontainers.image.title={{ .ProjectName }}'
-  #     - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
-  #     - '--label=org.opencontainers.image.version={{ .Version }}'
-  # - image_templates:
-  #     - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm-v8.2'
-  #   use: buildx
-  #   goos: linux
-  #   goarch: arm64
-  #   goarm: 'v8.2'
-  #   ids:
-  #     - default
-  #   dockerfile: build/Dockerfile
-  #   extra_files:
-  #     - go.mod
-  #     - go.sum
-  #   build_flag_templates:
-  #     - '--pull'
-  #     - '--platform=linux/arm64'
-  #     - '--label=org.opencontainers.image.created={{ .Date }}'
-  #     - '--label=org.opencontainers.image.title={{ .ProjectName }}'
-  #     - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
-  #     - '--label=org.opencontainers.image.version={{ .Version }}'
+  - image_templates:
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
+    use: buildx
+    goos: linux
+    goarch: amd64
+    goamd64: 'v4'
+    ids:
+      - default
+    dockerfile: build/Dockerfile
+    extra_files:
+      - go.mod
+      - go.sum
+    build_flag_templates:
+      - '--pull'
+      - '--platform=linux/amd64'
+      - '--label=org.opencontainers.image.created={{ .Date }}'
+      - '--label=org.opencontainers.image.title={{ .ProjectName }}'
+      - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
+      - '--label=org.opencontainers.image.version={{ .Version }}'
+  - image_templates:
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm-v8.2'
+    use: buildx
+    goos: linux
+    goarch: arm64
+    goarm: 'v8.2'
+    ids:
+      - default
+    dockerfile: build/Dockerfile
+    extra_files:
+      - go.mod
+      - go.sum
+    build_flag_templates:
+      - '--pull'
+      - '--platform=linux/arm64'
+      - '--label=org.opencontainers.image.created={{ .Date }}'
+      - '--label=org.opencontainers.image.title={{ .ProjectName }}'
+      - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
+      - '--label=org.opencontainers.image.version={{ .Version }}'
 docker_manifests:
   - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}'
     image_templates:
