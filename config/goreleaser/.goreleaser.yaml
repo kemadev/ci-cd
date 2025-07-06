@@ -108,8 +108,8 @@ docker_manifests:
   - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}'
     image_templates:
       - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v3'
-      # - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
-      # - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm-v8.2'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-amd64-v4'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64-v8.2'
 
 archives:
   - id: default
@@ -127,7 +127,7 @@ sboms:
   - id: default
     artifacts: binary
     documents:
-      - '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}_{{ if .Arm64 }}{{ .Arm64 }}{{ end }}{{ if .Amd64 }}{{ .Amd64 }}{{ end }}.spdx.json'
+      - '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}-{{ if .Arm64 }}{{ .Arm64 }}{{ end }}{{ if .Amd64 }}{{ .Amd64 }}{{ end }}.spdx.json'
 
 changelog:
   format: '{{ .SHA }}: {{ .Message }}'
