@@ -57,7 +57,8 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - '.'
+      - go.mod
+      - go.sum
     build_flag_templates:
       - '--pull'
       - '--platform=linux/amd64'
@@ -75,7 +76,8 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - '.'
+      - go.mod
+      - go.sum
     build_flag_templates:
       - '--pull'
       - '--platform=linux/amd64'
@@ -93,7 +95,8 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - '.'
+      - go.mod
+      - go.sum
     build_flag_templates:
       - '--pull'
       - '--platform=linux/arm64'
