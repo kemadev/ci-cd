@@ -57,10 +57,10 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - go.mod
-      - go.sum
+      - ./
     build_flag_templates:
       - '--pull'
+      - '--secret=id=gitcreds,src=/tmp/gitcreds'
       - '--platform=linux/amd64'
       - '--label=org.opencontainers.image.created={{ .Date }}'
       - '--label=org.opencontainers.image.title={{ .ProjectName }}'
@@ -76,17 +76,17 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - go.mod
-      - go.sum
+      - ./
     build_flag_templates:
       - '--pull'
+      - '--secret=id=gitcreds,src=/tmp/gitcreds'
       - '--platform=linux/amd64'
       - '--label=org.opencontainers.image.created={{ .Date }}'
       - '--label=org.opencontainers.image.title={{ .ProjectName }}'
       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
       - '--label=org.opencontainers.image.version={{ .Version }}'
   - image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm-v8.2'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}:{{ .Version }}-arm64-v8.2'
     use: buildx
     goos: linux
     goarch: arm64
@@ -95,10 +95,10 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - go.mod
-      - go.sum
+      - ./
     build_flag_templates:
       - '--pull'
+      - '--secret=id=gitcreds,src=/tmp/gitcreds'
       - '--platform=linux/arm64'
       - '--label=org.opencontainers.image.created={{ .Date }}'
       - '--label=org.opencontainers.image.title={{ .ProjectName }}'
