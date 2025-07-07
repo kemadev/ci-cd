@@ -49,7 +49,7 @@
 
 #### Prerequisites
 
-- [Docker](https://github.com/docker/cli) and [Docker Compose](https://github.com/docker/compose) to run applications in containers. You should configure your credentials store and credential helpers for Docker to work with your container registry
+- [Docker](https://github.com/docker/cli) to run applications in containers. You should configure your credentials store and credential helpers for Docker to work with your container registry
 - [Go](https://github.com/golang/go) to install applications dependencies as needed
 - [Pulumi](https://github.com/pulumi/pulumi) to manage Cloud resources
 - [kind](https://github.com/kubernetes-sigs/kind) to run Kubernetes clusters locally
@@ -64,12 +64,14 @@
 
 ##### Locally
 
-- CI pipelines can be mimicked locally using `kema-runner` image, mounting project's directory as a volume in `/src`, and running the same commands as in the CI pipeline
+- CI pipelines can be mimicked locally using `ci-cd` image, mounting project's directory as a volume in `/src`, and running the same commands as in the CI pipeline
 - That is, you can run the following command to run the whole CI pipeline locally:
 
   ```bash
-  docker run [--rm] -i -t -v .:/src github.com/kemadev/kema-runner ci [--fix]
+  docker run [--rm] -i -t -v .:/src:Z ghcr.io/kemadev/ci-cd:latest ci [--fix]
   ```
+
+- Replace `ci` with `--help` to see available commands!
 
 ##### False positives
 
