@@ -46,10 +46,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo -e "machine $(git remote get-url origin | sed -E 's#(https?://)?([^/@:]+).*#\2#')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/gitcreds"
+          echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/gitcreds"
       - name: Go release
         id: go-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           kema-runner release
+      - name: Clean up
+        when: always
+        shell: bash
+        run: |
+          rm -f /tmp/gitcreds
+          docker logout ghcr.io

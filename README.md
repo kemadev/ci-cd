@@ -71,7 +71,15 @@
   docker run [--rm] -i -t -v .:/src:Z ghcr.io/kemadev/ci-cd:latest ci [--fix]
   ```
 
-- Replace `ci` with `--help` to see available commands!
+- Replace `ci` with `help` to see available commands!
+- You can also run workflows with hot-reloading using:
+
+  ```bash
+  echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword $(gh auth token)\n" > /tmp/gitcreds
+  docker run [--rm] -i -t -v .:/src:Z -v /tmp/gitcreds:/home/nonroot/.netrc:Z ghcr.io/kemadev/ci-cd-dev:latest ci [--fix]
+  ```
+
+- `/home/nonroot/.netrc` is needed to allow the container to download dependencies from private repositories, and will use your personal credentials to do so
 
 ##### False positives
 
