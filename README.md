@@ -54,7 +54,7 @@
 - [Pulumi](https://github.com/pulumi/pulumi) to manage Cloud resources
 - [kind](https://github.com/kubernetes-sigs/kind) to run Kubernetes clusters locally
 - [Kubectl](https://github.com/kubernetes/kubectl) to manage Kubernetes resources (not strictly required but quite handy)
-- Very few other CLI tools such as [git](https://github.com/git/git), that are most likely already installed on your system
+- Very few other CLI tools such as [git](https://github.com/git/git), [bash](https://www.gnu.org/software/bash/), ... that are most likely already installed on your system
 
 #### Running the project
 
