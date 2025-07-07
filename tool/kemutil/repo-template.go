@@ -24,11 +24,11 @@ func runRepoTemplateTasks(args []string) error {
 
 	var skipAnswered bool
 	flagSet := flag.NewFlagSet("repo-template", flag.ExitOnError)
-	flagSet.BoolVar(&skipAnswered, "skipanswered", false, "Skip answered questions in copier update")
+	flagSet.BoolVar(&skipAnswered, "skip-answered", false, "Skip answered questions in copier update")
 
 	flagSet.Parse(args)
 
-	if len(flag.Args()) != 1 {
+	if len(flagSet.Args()) != 1 {
 		return fmt.Errorf(
 			"expected exactly one argument for repository template tasks, got %d",
 			len(flag.Args()),
