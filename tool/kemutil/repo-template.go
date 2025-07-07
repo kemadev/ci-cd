@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log/slog"
 	"net/url"
@@ -20,10 +21,17 @@ var (
 
 func runRepoTemplateTasks(args []string) error {
 	slog.Debug("Running repository template tasks", slog.Any("args", args))
-	if len(args) != 1 {
+
+	var skipAnswered bool
+	flagSet := flag.NewFlagSet("repo-template", flag.ExitOnError)
+	flagSet.BoolVar(&skipAnswered, "skipanswered", false, "Skip answered questions in copier update")
+
+	flagSet.Parse(args)
+
+	if len(flag.Args()) != 1 {
 		return fmt.Errorf(
 			"expected exactly one argument for repository template tasks, got %d",
-			len(args),
+			len(flag.Args()),
 		)
 	}
 
@@ -32,7 +40,7 @@ func runRepoTemplateTasks(args []string) error {
 		panic(err)
 	}
 
-	task := args[0]
+	task := flag.Args()[0]
 	switch task {
 	case "init":
 		slog.Info("Initializing repository template")
