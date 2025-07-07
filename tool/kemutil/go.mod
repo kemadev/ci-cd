@@ -1,4 +1,4 @@
-module github.com/kemadev/ci-cd/tool/common
+module github.com/kemadev/ci-cd/tool/kemutil
 
 go 1.24.3
 
