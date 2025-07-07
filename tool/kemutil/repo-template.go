@@ -31,7 +31,7 @@ func runRepoTemplateTasks(args []string) error {
 	if len(flagSet.Args()) != 1 {
 		return fmt.Errorf(
 			"expected exactly one argument for repository template tasks, got %d",
-			len(flag.Args()),
+			len(flagSet.Args()),
 		)
 	}
 
@@ -40,7 +40,7 @@ func runRepoTemplateTasks(args []string) error {
 		panic(err)
 	}
 
-	task := flag.Args()[0]
+	task := flagSet.Args()[0]
 	switch task {
 	case "init":
 		slog.Info("Initializing repository template")
