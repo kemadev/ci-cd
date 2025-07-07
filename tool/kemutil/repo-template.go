@@ -51,9 +51,14 @@ func runRepoTemplateTasks(args []string) error {
 		)
 	case "update":
 		slog.Info("Updating repository template")
+		baseArgs := []string{binary, "update", "--answers-file", copierConfigPath}
+		if skipAnswered {
+			slog.Debug("Skip answered questions enabled", slog.Bool("skipAnswered", skipAnswered))
+			baseArgs = append(baseArgs, "--skip-answered")
+		}
 		syscall.Exec(
 			binary,
-			[]string{binary, "update", "--answers-file", copierConfigPath},
+			baseArgs,
 			os.Environ(),
 		)
 	default:
