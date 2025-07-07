@@ -23,6 +23,27 @@ var (
 	ErrNoCommandProvided = fmt.Errorf("no command provided")
 )
 
+const (
+	CommandDocker            = "docker"
+	CommandGHA               = "gha"
+	CommandSecrets           = "secrets"
+	CommandSAST              = "sast"
+	CommandGoTest            = "go-test"
+	CommandGoCover           = "go-cover"
+	CommandGoModTidy         = "go-mod-tidy"
+	CommandGoModName         = "go-mod-name"
+	CommandGoLint            = "go-lint"
+	CommandDeps              = "deps"
+	CommandMarkdown          = "markdown"
+	CommandShell             = "shell"
+	CommandRelease           = "release"
+	CommandPRTitleCheck      = "pr-title-check"
+	CommandRepoTemplateStale = "repo-template-stale-check"
+	CommandBranchStaleCheck  = "branch-stale-check"
+	CommandCI                = "ci"
+	CommandHelp              = "help"
+)
+
 //nolint:cyclop,funlen // the enormous switch is (hopefully) easily understandable for a human
 func DispatchCommand(config *config.Config, args []string) (int, error) {
 	gitRepoBasePath, err := git.GetGitBasePath()
@@ -48,8 +69,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 	goErr := error(nil)
 
 	switch args[0] {
-	case "docker":
-		slog.Info(fmt.Sprintf("running %s", "docker"))
+	case CommandDocker:
+		slog.Info(fmt.Sprintf("running %s", CommandDocker))
 		rc, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
@@ -88,8 +109,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "gha":
-		slog.Info(fmt.Sprintf("running %s", "gha"))
+	case CommandGHA:
+		slog.Info(fmt.Sprintf("running %s", CommandGHA))
 		rc, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
@@ -132,8 +153,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "secrets":
-		slog.Info(fmt.Sprintf("running %s", "secrets"))
+	case CommandSecrets:
+		slog.Info(fmt.Sprintf("running %s", CommandSecrets))
 		rc, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
@@ -186,8 +207,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "sast":
-		slog.Info(fmt.Sprintf("running %s", "sast"))
+	case CommandSAST:
+		slog.Info(fmt.Sprintf("running %s", CommandSAST))
 		rc, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
@@ -250,14 +271,14 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "go-test":
-		slog.Info(fmt.Sprintf("running %s", "go-test"))
+	case CommandGoTest:
+		slog.Info(fmt.Sprintf("running %s", CommandGoTest))
 		for _, mod := range goModList {
 			if strings.HasPrefix(mod, filesfind.FilesFindingRootPath+"/deploy/") {
-				slog.Info(fmt.Sprintf("skipping %s", "go-test"), slog.String("mod", mod))
+				slog.Info(fmt.Sprintf("skipping %s", CommandGoTest), slog.String("mod", mod))
 				continue
 			}
-			slog.Info(fmt.Sprintf("running %s", "go-test"), slog.String("mod", mod))
+			slog.Info(fmt.Sprintf("running %s", CommandGoTest), slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
 				config,
 				lint.LinterArgs{
@@ -321,14 +342,14 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return goRc, goErr
 
-	case "go-cover":
-		slog.Info(fmt.Sprintf("running %s", "go-cover"))
+	case CommandGoCover:
+		slog.Info(fmt.Sprintf("running %s", CommandGoCover))
 		for _, mod := range goModList {
 			if strings.HasPrefix(mod, filesfind.FilesFindingRootPath+"/deploy/") {
-				slog.Info(fmt.Sprintf("skipping %s", "go-cover"), slog.String("mod", mod))
+				slog.Info(fmt.Sprintf("skipping %s", CommandGoCover), slog.String("mod", mod))
 				continue
 			}
-			slog.Info(fmt.Sprintf("running %s", "go-cover"), slog.String("mod", mod))
+			slog.Info(fmt.Sprintf("running %s", CommandGoCover), slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
 				config,
 				lint.LinterArgs{
@@ -382,10 +403,10 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return goRc, goErr
 
-	case "go-mod-tidy":
-		slog.Info(fmt.Sprintf("running %s", "go-mod-tidy"))
+	case CommandGoModTidy:
+		slog.Info(fmt.Sprintf("running %s", CommandGoModTidy))
 		for _, mod := range goModList {
-			slog.Info(fmt.Sprintf("running %s", "go-mod-tidy"), slog.String("mod", mod))
+			slog.Info(fmt.Sprintf("running %s", CommandGoModTidy), slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
 				config,
 				lint.LinterArgs{
@@ -435,10 +456,10 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return goRc, goErr
 
-	case "go-mod-name":
-		slog.Info(fmt.Sprintf("running %s", "go-mod-name"))
+	case CommandGoModName:
+		slog.Info(fmt.Sprintf("running %s", CommandGoModName))
 		for _, mod := range goModList {
-			slog.Info(fmt.Sprintf("running %s", "go-mod-name"), slog.String("mod", mod))
+			slog.Info(fmt.Sprintf("running %s", CommandGoModName), slog.String("mod", mod))
 			expectedGoModName := gitRepoBasePath + strings.Split(strings.Join(strings.Split(mod, filesfind.FilesFindingRootPath)[1:], ""), "/go.mod")[0]
 			retCode, _, _, err := lint.RunLinter(
 				config,
@@ -501,12 +522,12 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return goRc, goErr
 
-	case "go-lint":
+	case CommandGoLint:
 		var fixEnabled bool
 		if len(args) > 1 && args[1] == "--fix" {
 			fixEnabled = true
 		}
-		slog.Info(fmt.Sprintf("running %s", "go-lint"), slog.Bool("fixEnabled", fixEnabled))
+		slog.Info(fmt.Sprintf("running %s", CommandGoLint), slog.Bool("fixEnabled", fixEnabled))
 
 		lintArgs := []string{
 			"run",
@@ -555,14 +576,14 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "deps":
+	case CommandDeps:
 		f, err := os.CreateTemp("/tmp", "sbom-*.json")
 		if err != nil {
 			return 1, fmt.Errorf("error creating temp file: %w", err)
 		}
 		defer os.Remove(f.Name())
 		slog.Info(
-			fmt.Sprintf("running %s", "deps"),
+			fmt.Sprintf("running %s", CommandDeps),
 			slog.String("step", "syft"),
 			slog.String("outputFile", f.Name()),
 		)
@@ -586,7 +607,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			return rc, err
 		}
 		slog.Info(
-			fmt.Sprintf("running %s", "deps"),
+			fmt.Sprintf("running %s", CommandDeps),
 			slog.String("step", "grype"),
 			slog.String("outputFile", f.Name()),
 		)
@@ -651,8 +672,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "markdown":
-		slog.Info(fmt.Sprintf("running %s", "markdown"))
+	case CommandMarkdown:
+		slog.Info(fmt.Sprintf("running %s", CommandMarkdown))
 		rc, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
@@ -705,8 +726,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "shell":
-		slog.Info(fmt.Sprintf("running %s", "shell"))
+	case CommandShell:
+		slog.Info(fmt.Sprintf("running %s", CommandShell))
 		rc, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
@@ -754,9 +775,9 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "release":
-		slog.Info(fmt.Sprintf("running %s", "release"))
-		slog.Info(fmt.Sprintf("running %s", "release"), slog.String("step", "tag-semver"))
+	case CommandRelease:
+		slog.Info(fmt.Sprintf("running %s", CommandRelease))
+		slog.Info(fmt.Sprintf("running %s", CommandRelease), slog.String("step", "tag-semver"))
 
 		skip, err := git.TagSemver()
 		if err != nil {
@@ -767,7 +788,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			return 0, nil
 		}
 
-		slog.Info(fmt.Sprintf("running %s", "release"), slog.String("step", "goreleaser"))
+		slog.Info(fmt.Sprintf("running %s", CommandRelease), slog.String("step", "goreleaser"))
 
 		rc, _, _, err := lint.RunLinter(
 			config,
@@ -786,8 +807,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return rc, err
 
-	case "pr-title-check":
-		slog.Info(fmt.Sprintf("running %s", "pr-title-check"))
+	case CommandPRTitleCheck:
+		slog.Info(fmt.Sprintf("running %s", CommandPRTitleCheck))
 		finding, err := pr.CheckPRTitle(os.Args)
 		if err != nil {
 			return 1, fmt.Errorf("error checking PR title: %w", err)
@@ -806,8 +827,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return 0, nil
 
-	case "repo-template-stale-check":
-		slog.Info(fmt.Sprintf("running %s", "repo-template-stale-check"))
+	case CommandRepoTemplateStale:
+		slog.Info(fmt.Sprintf("running %s", CommandRepoTemplateStale))
 		finding, err := repotpl.CheckRepoTemplateUpdate()
 		if err != nil {
 			return 1, fmt.Errorf("error checking stale repository template: %w", err)
@@ -826,7 +847,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return 0, nil
 
-	case "branch-stale-check":
+	case CommandBranchStaleCheck:
+		slog.Info(fmt.Sprintf("running %s", CommandBranchStaleCheck))
 		finding, err := branch.CheckStaleBranches()
 		if err != nil {
 			return 1, fmt.Errorf("error checking stale branches: %w", err)
@@ -845,8 +867,8 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return 0, nil
 
-	case "ci":
-		slog.Info(fmt.Sprintf("running %s", "ci"))
+	case CommandCI:
+		slog.Info(fmt.Sprintf("running %s", CommandCI))
 		var waitGroup sync.WaitGroup
 
 		commands := []string{
@@ -913,6 +935,30 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		slog.Info("All commands succeeded")
 
+		return 0, nil
+
+	case "help":
+		slog.Info("Available commands:")
+		slog.Info("  " + CommandDocker + " - Run Dockerfile linter")
+		slog.Info("  " + CommandGHA + " - Run GitHub Actions linter")
+		slog.Info("  " + CommandSecrets + " - Run secrets detection")
+		slog.Info("  " + CommandSAST + " - Run Static Application Security Testing (SAST)")
+		slog.Info("  " + CommandGoTest + " - Run Go tests")
+		slog.Info("  " + CommandGoCover + " - Run Go test coverage")
+		slog.Info("  " + CommandGoModTidy + " - Run Go mod tidyness check")
+		slog.Info("  " + CommandGoModName + " - Check Go module name check")
+		slog.Info("  " + CommandGoLint + " - Run Go linter")
+		slog.Info("  " + CommandDeps + " - Run dependency analysis")
+		slog.Info("  " + CommandMarkdown + " - Run Markdown linter")
+		slog.Info("  " + CommandShell + " - Run Shell script linter")
+		slog.Info("  " + CommandRelease + " - Run release process")
+		slog.Info("  " + CommandPRTitleCheck + " - Check PR title format")
+		slog.Info(
+			"  " + CommandRepoTemplateStale + " - Check if repository template is stale",
+		)
+		slog.Info("  " + CommandBranchStaleCheck + " - Check for stale branches")
+		slog.Info("  " + CommandCI + " - Run all CI commands (mimics GitHub Pull Request CI)")
+		slog.Info("  " + CommandHelp + " - Show this help message")
 		return 0, nil
 
 	default:
