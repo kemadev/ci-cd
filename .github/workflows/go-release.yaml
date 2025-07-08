@@ -54,8 +54,8 @@ jobs:
         run: |
           kema-runner release
       - name: Clean up
-        when: always
+        if: always()
         shell: bash
         run: |
-          rm -f /tmp/gitcreds
-          docker logout ghcr.io
+          rm -f /tmp/gitcreds || echo "Git credentials file removal failed"
+          docker logout ghcr.io || echo "Docker logout failed"

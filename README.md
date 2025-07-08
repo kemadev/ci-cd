@@ -58,7 +58,7 @@
 
 #### Running the project
 
-- Common tasks such as running, testing, creating new IaC components, updating Cloud resources, ... are done by mimicking the CI pipelines, using the same container images and the same commands
+- Common tasks such as running, testing, creating new IaC components, updating Cloud resources, ... are done by using [kemutil](https://github.com/kemadev/ci-cd/tree/main/tool/kemutil). You are encouraged to install and use it!
 
 #### CI / CD
 
@@ -68,18 +68,16 @@
 - That is, you can run the following command to run the whole CI pipeline locally:
 
   ```bash
-  docker run [--rm] -i -t -v .:/src:Z ghcr.io/kemadev/ci-cd:latest ci [--fix]
+  kemutil ci [--fix] [--hot] ci
   ```
 
-- Replace `ci` with `help` to see available commands!
-- You can also run workflows with hot-reloading using:
+- When using `--hot`, your need to export `GIT_TOKEN` environment variable to propagate your git credentials to the container, so that it can fetch private dependencies. This is typically done by running:
 
   ```bash
-  echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword $(gh auth token)\n" > /tmp/gitcreds
-  docker run [--rm] -i -t -v .:/src:Z -v /tmp/gitcreds:/home/nonroot/.netrc:Z ghcr.io/kemadev/ci-cd-dev:latest ci [--fix]
+  export GIT_TOKEN=$(gh auth token)
   ```
 
-- `/home/nonroot/.netrc` is needed to allow the container to download dependencies from private repositories, and will use your personal credentials to do so
+- Other commands are available, feel free to run `kemutil help` to see the list of available commands and their usage
 
 ##### False positives
 
