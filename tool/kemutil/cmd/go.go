@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// goCmd represents the go command
 var goCmd = &cobra.Command{
 	Use:   "go",
 	Short: "Wrapper for Go tasks",

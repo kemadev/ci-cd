@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// workflowCmd represents the workflow command
 var workflowCmd = &cobra.Command{
 	Use:   "workflow",
 	Short: "Run workflows",
