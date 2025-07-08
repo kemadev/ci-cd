@@ -36,5 +36,5 @@ func init() {
 	repotplCmd.AddCommand(repotplInit)
 	repotplCmd.AddCommand(repotplUpdate)
 	repotplUpdate.Flags().
-		BoolVarP(&repotpl.SkipAnswered, "skip-answered", "s", false, "Skip answered questions update")
+		BoolVar(&repotpl.SkipAnswered, "skip-answered", false, "Skip answered questions update")
 }
