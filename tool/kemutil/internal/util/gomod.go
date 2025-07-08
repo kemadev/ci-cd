@@ -9,6 +9,19 @@ import (
 )
 
 func GetGoModExpectedName() (string, error) {
+	workdir, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("error getting current working directory: %w", err)
+	}
+	modName, err := GetGoModExpectedNameFromPath(workdir)
+	if err != nil {
+		return "", fmt.Errorf("error getting expected go.mod name: %w", err)
+	}
+
+	return modName, nil
+}
+
+func GetGoModExpectedNameFromPath(basePath string) (string, error) {
 	basePath, err := git.GetGitBasePath()
 	if err != nil {
 		return "", fmt.Errorf("error getting git repository base path: %w", err)
@@ -17,12 +30,7 @@ func GetGoModExpectedName() (string, error) {
 		return "", fmt.Errorf("error getting git repository base path")
 	}
 
-	workdir, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("error getting current working directory: %w", err)
-	}
-
-	repoRoot := workdir
+	repoRoot := basePath
 	for {
 		if _, err := os.Stat(filepath.Join(repoRoot, ".git")); err == nil {
 			return repoRoot, nil
@@ -34,24 +42,13 @@ func GetGoModExpectedName() (string, error) {
 		repoRoot = parent
 	}
 
-	relPath, err := filepath.Rel(repoRoot, workdir)
+	relPath, err := filepath.Rel(repoRoot, basePath)
 	if err != nil {
 		return "", fmt.Errorf("error getting relative path: %w", err)
 	}
 	relPath = filepath.ToSlash(relPath)
 
 	goModName := fmt.Sprintf("%s%s", basePath, relPath)
-
-	return goModName, nil
-}
-
-func GetGoModExpectedNameFromPath(basePath string) (string, error) {
-	workdir, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("error getting current working directory: %w", err)
-	}
-
-	goModName := fmt.Sprintf("%s/%s", basePath, workdir)
 
 	return goModName, nil
 }
