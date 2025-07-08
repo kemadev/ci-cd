@@ -13,6 +13,7 @@ func GetGoModExpectedName() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error getting current working directory: %w", err)
 	}
+
 	modName, err := GetGoModExpectedNameFromPath(workdir)
 	if err != nil {
 		return "", fmt.Errorf("error getting expected go.mod name: %w", err)
@@ -21,7 +22,7 @@ func GetGoModExpectedName() (string, error) {
 	return modName, nil
 }
 
-func GetGoModExpectedNameFromPath(basePath string) (string, error) {
+func GetGoModExpectedNameFromPath(path string) (string, error) {
 	basePath, err := git.GetGitBasePath()
 	if err != nil {
 		return "", fmt.Errorf("error getting git repository base path: %w", err)
@@ -30,7 +31,7 @@ func GetGoModExpectedNameFromPath(basePath string) (string, error) {
 		return "", fmt.Errorf("error getting git repository base path")
 	}
 
-	repoRoot := basePath
+	repoRoot := path
 	for {
 		if _, err := os.Stat(filepath.Join(repoRoot, ".git")); err == nil {
 			return repoRoot, nil
@@ -42,13 +43,13 @@ func GetGoModExpectedNameFromPath(basePath string) (string, error) {
 		repoRoot = parent
 	}
 
-	relPath, err := filepath.Rel(repoRoot, basePath)
+	relPath, err := filepath.Rel(repoRoot, path)
 	if err != nil {
 		return "", fmt.Errorf("error getting relative path: %w", err)
 	}
 	relPath = filepath.ToSlash(relPath)
 
-	goModName := fmt.Sprintf("%s%s", basePath, relPath)
+	goModName := fmt.Sprintf("%s/%s", basePath, relPath)
 
 	return goModName, nil
 }
