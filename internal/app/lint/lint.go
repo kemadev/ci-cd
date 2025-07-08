@@ -98,7 +98,8 @@ func startCmd(
 	go processPipe(config, stdoutPipe, &stdoutBuf, outputs[0], &waitGroup)
 	go processPipe(config, stderrPipe, &stderrBuf, outputs[1], &waitGroup)
 
-	if err := cmd.Start(); err != nil {
+	err = cmd.Start()
+	if err != nil {
 		return nil, nil, nil, nil, fmt.Errorf("error starting command: %w", err)
 	}
 

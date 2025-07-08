@@ -109,7 +109,8 @@ func FindingsFromJSON(str string, jsonInfo JsonInfos) ([]Finding, error) {
 	}
 
 	var jsonm interface{}
-	if err := json.Unmarshal([]byte(str), &jsonm); err != nil {
+	err := json.Unmarshal([]byte(str), &jsonm)
+	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling json: %w", err)
 	}
 

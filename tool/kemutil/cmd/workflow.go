@@ -34,10 +34,10 @@ var workflowCustomCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(workflowCmd)
 	workflowCmd.PersistentFlags().
-		BoolVar(&workflow.Hot, "hot", false, "Enable hot reload mode")
+		BoolVarP(&workflow.Hot, "hot", "h", false, "Enable hot reload mode")
 	workflowCmd.PersistentFlags().
-		BoolVar(&workflow.RunnerDebug, "runner-debug", false, "Enable debug mode for the CI/CD runner")
+		BoolVarP(&workflow.RunnerDebug, "runner-debug", "d", false, "Enable debug mode for the CI/CD runner")
 	workflowCmd.AddCommand(workflowCiCmd)
 	workflowCmd.AddCommand(workflowCustomCmd)
-	workflowCmd.PersistentFlags().BoolVar(&workflow.Fix, "fix", false, "Enable fix mode")
+	workflowCmd.PersistentFlags().BoolVarP(&workflow.Fix, "fix", "f", false, "Enable fix mode")
 }

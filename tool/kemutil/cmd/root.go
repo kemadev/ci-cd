@@ -28,7 +28,7 @@ func Execute() {
 var DebugEnabled bool
 
 func init() {
-	rootCmd.PersistentFlags().BoolVar(&DebugEnabled, "debug", false, "Enable debug output")
+	rootCmd.PersistentFlags().BoolVarP(&DebugEnabled, "debug", "d", false, "Enable debug output")
 	if DebugEnabled {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 		slog.Debug("Debug mode is enabled, setting log level to debug")
