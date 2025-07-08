@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 
 	"github.com/kemadev/ci-cd/tool/kemutil/repotpl"
 	"github.com/spf13/cobra"
@@ -108,10 +109,7 @@ func Ci(cmd *cobra.Command, args []string) error {
 
 	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
 
-	command := exec.Command(binary, baseArgs...)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	err = command.Run()
+	err = syscall.Exec(binary, append([]string{binary}, baseArgs...), os.Environ())
 	if err != nil {
 		return fmt.Errorf("error running workflow ci command: %w", err)
 	}
@@ -152,10 +150,7 @@ func Custom(cmd *cobra.Command, args []string) error {
 
 	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
 
-	command := exec.Command(binary, baseArgs...)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	err = command.Run()
+	err = syscall.Exec(binary, append([]string{binary}, baseArgs...), os.Environ())
 	if err != nil {
 		return fmt.Errorf("error running workflow custom command: %w", err)
 	}

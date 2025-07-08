@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"syscall"
 
 	"github.com/spf13/cobra"
 )
@@ -34,12 +35,9 @@ func Init(cmd *cobra.Command, args []string) error {
 	baseArgs := []string{"copy", RepoTemplateURL.String(), "."}
 	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
 
-	command := exec.Command(binary, baseArgs...)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	err = command.Run()
+	err = syscall.Exec(binary, append([]string{binary}, baseArgs...), os.Environ())
 	if err != nil {
-		return fmt.Errorf("error running copier command: %w", err)
+		return fmt.Errorf("error running copier init command: %w", err)
 	}
 
 	return nil
@@ -61,10 +59,7 @@ func Update(cmd *cobra.Command, args []string) error {
 	}
 	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
 
-	command := exec.Command(binary, baseArgs...)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	err = command.Run()
+	err = syscall.Exec(binary, append([]string{binary}, baseArgs...), os.Environ())
 	if err != nil {
 		return fmt.Errorf("error running copier update command: %w", err)
 	}
