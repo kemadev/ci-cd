@@ -8,6 +8,7 @@ import (
 
 	"github.com/kemadev/ci-cd/tool/kemutil/internal/util"
 	"github.com/kemadev/ci-cd/tool/kemutil/wgo"
+	ut "github.com/kemadev/infrastructure-components/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -35,10 +36,12 @@ func renderTemplates() ([]templatedFile, error) {
 		return nil, fmt.Errorf("error getting expected Go module name: %w", err)
 	}
 
+	moduleNameDash := ut.KebabCase(moduleName)
+
 	pulumiYaml := templatedFile{
 		Name: "Pulumi.yaml",
-		Content: `name: ` + moduleName + `
-description: ` + moduleName + `
+		Content: `name: ` + moduleNameDash + `
+description: IaC for ` + moduleName + `
 runtime: go
 config:
   pulumi:disable-default-providers:
@@ -50,8 +53,6 @@ config:
 	pulumiDevYaml := templatedFile{
 		Name: "Pulumi." + StackNameDev + ".yaml",
 		Content: `config: {}
-backend:
-  url: file://./pulumi-backend
 `,
 	}
 	pulumiNextYaml := templatedFile{
