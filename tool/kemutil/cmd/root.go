@@ -29,5 +29,5 @@ func Execute() {
 var debug bool
 
 func init() {
-	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debug output")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Enable debug output")
 }
