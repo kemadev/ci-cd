@@ -29,10 +29,10 @@ var (
 	// Hot is a flag to enable hot reload mode.
 	Hot bool
 	// Fix is a flag to enable fix mode.
-	Fix        bool
+	Fix bool
 	// RunnerDebug is a flag to enable debug mode for the CI/CD runner.
 	RunnerDebug bool
-	dockerArgs func(binary string) []string = func(binary string) []string {
+	dockerArgs  func(binary string) []string = func(binary string) []string {
 		return []string{
 			binary,
 			"run",
