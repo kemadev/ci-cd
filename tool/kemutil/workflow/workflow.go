@@ -25,7 +25,9 @@ var (
 )
 
 var (
-	Hot        bool
+	// Hot is a flag to enable hot reload mode.
+	Hot bool
+	// Fix is a flag to enable fix mode.
 	Fix        bool
 	dockerArgs func(binary string) []string = func(binary string) []string {
 		return []string{
