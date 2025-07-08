@@ -8,10 +8,11 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "kemutil",
-	Short: "Little helpers for easy development",
-	Long:  `kemutil is a collection of small utilities to help with development tasks`,
-	Args:  cobra.MinimumNArgs(1),
+	Use:    "kemutil",
+	Short:  "Little helpers for easy development",
+	Long:   `kemutil is a collection of small utilities to help with development tasks`,
+	Args:   cobra.MinimumNArgs(1),
+	PreRun: toggleDebug,
 }
 
 // Execute runs the root command, and thus its subcommands.
@@ -24,13 +25,9 @@ func Execute() {
 	}
 }
 
-// DebugEnabled is a flag to enable debug output.
-var DebugEnabled bool
+// debug is a flag to enable debug output, actually unused
+var debug bool
 
 func init() {
-	rootCmd.PersistentFlags().BoolVarP(&DebugEnabled, "debug", "d", false, "Enable debug output")
-	if DebugEnabled {
-		slog.SetLogLoggerLevel(slog.LevelDebug)
-		slog.Debug("Debug mode is enabled, setting log level to debug")
-	}
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debug output")
 }

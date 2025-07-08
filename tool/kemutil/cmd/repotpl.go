@@ -10,6 +10,7 @@ var repotplCmd = &cobra.Command{
 	Short: "Repository template helpers",
 	Long:  `Run tasks related to repository templates, such as initializing or updating`,
 	Args:  cobra.ExactArgs(1),
+	PreRun: toggleDebug,
 }
 
 var repotplInit = &cobra.Command{
@@ -18,6 +19,7 @@ var repotplInit = &cobra.Command{
 	Long:  `Initialize the repository template from upstream`,
 	RunE:  repotpl.Init,
 	Args:  cobra.NoArgs,
+	PreRun: toggleDebug,
 }
 
 var repotplUpdate = &cobra.Command{
@@ -26,6 +28,7 @@ var repotplUpdate = &cobra.Command{
 	Long:  `Update the repository template with the latest changes from upstream`,
 	RunE:  repotpl.Update,
 	Args:  cobra.NoArgs,
+	PreRun: toggleDebug,
 }
 
 func init() {

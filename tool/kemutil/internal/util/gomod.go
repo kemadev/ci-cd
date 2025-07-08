@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/kemadev/ci-cd/pkg/git"
 )
@@ -14,6 +15,8 @@ func GetGoModExpectedName() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error getting current working directory: %w", err)
 	}
+
+	slog.Debug("Current working directory", slog.String("workdir", workdir))
 
 	modName, err := GetGoModExpectedNameFromPath(workdir)
 	if err != nil {
@@ -37,22 +40,27 @@ func GetGoModExpectedNameFromPath(path string) (string, error) {
 	repoRoot := path
 	for {
 		if _, err := os.Stat(filepath.Join(repoRoot, ".git")); err == nil {
-			return repoRoot, nil
+			break
 		}
 		parent := filepath.Dir(repoRoot)
 		if parent == repoRoot {
-			break // reached root
+			break
 		}
 		repoRoot = parent
 	}
+
+	slog.Debug("Git repository root found", slog.String("repoRoot", repoRoot))
 
 	relPath, err := filepath.Rel(repoRoot, path)
 	if err != nil {
 		return "", fmt.Errorf("error getting relative path: %w", err)
 	}
+	if relPath == "." {
+		relPath = ""
+	}
 	relPath = filepath.ToSlash(relPath)
 
-	goModName := fmt.Sprintf("%s/%s", basePath, relPath)
+	goModName := strings.TrimSuffix(fmt.Sprintf("%s/%s", basePath, relPath), "/")
 
 	return goModName, nil
 }

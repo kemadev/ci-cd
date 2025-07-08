@@ -10,6 +10,7 @@ var goCmd = &cobra.Command{
 	Short: "Wrapper for Go tasks",
 	Long:  `Run everyday Go tasks like initializing a module, updating dependencies, ...`,
 	Args:  cobra.ExactArgs(1),
+	PreRun: toggleDebug,
 }
 
 var goInit = &cobra.Command{
@@ -20,6 +21,7 @@ var goInit = &cobra.Command{
 Repository url and module path are used to form the module name`,
 	RunE: wgo.Init,
 	Args: cobra.NoArgs,
+	PreRun: toggleDebug,
 }
 
 var goUpdate = &cobra.Command{
@@ -28,6 +30,7 @@ var goUpdate = &cobra.Command{
 	Long:  `Update all Go modules dependencies found in the current directory and subdirectories`,
 	RunE:  wgo.Update,
 	Args:  cobra.NoArgs,
+	PreRun: toggleDebug,
 }
 
 var goTidy = &cobra.Command{
@@ -36,6 +39,7 @@ var goTidy = &cobra.Command{
 	Long:  `Tidy all Go modules dependencies found in the current directory and subdirectories`,
 	RunE:  wgo.Tidy,
 	Args:  cobra.NoArgs,
+	PreRun: toggleDebug,
 }
 
 func init() {

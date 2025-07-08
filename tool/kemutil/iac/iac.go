@@ -1,4 +1,4 @@
-package pulumi
+package iac
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/kemadev/ci-cd/tool/kemutil/internal/util"
 	"github.com/kemadev/ci-cd/tool/kemutil/wgo"
 	"github.com/spf13/cobra"
 )
@@ -28,12 +29,16 @@ var (
 	Refresh bool
 )
 
-var (
-	pulumiYaml = templatedFile{
+func renderTemplates() ([]templatedFile, error) {
+	moduleName, err := util.GetGoModExpectedName()
+	if err != nil {
+		return nil, fmt.Errorf("error getting expected Go module name: %w", err)
+	}
+
+	pulumiYaml := templatedFile{
 		Name: "Pulumi.yaml",
-		Content: `
-name: {{ .ModuleName }}
-description: {{ .ModuleDescription }}
+		Content: `name: ` + moduleName + `
+description: ` + moduleName + `
 runtime: go
 config:
   pulumi:disable-default-providers:
@@ -42,23 +47,23 @@ config:
       - '*'
 `,
 	}
-	pulumiDevYaml = templatedFile{
+	pulumiDevYaml := templatedFile{
 		Name: "Pulumi." + StackNameDev + ".yaml",
 		Content: `config: {}
 `,
 	}
-	pulumiNextYaml = templatedFile{
+	pulumiNextYaml := templatedFile{
 		Name: "Pulumi." + StackNameNext + ".yaml",
 		Content: `config: {}
 `,
 	}
-	pulumiProdYaml = templatedFile{
+	pulumiProdYaml := templatedFile{
 		Name: "Pulumi." + StackNameProd + ".yaml",
 		Content: `config: {}
 `,
 	}
-	mainGo = templatedFile{
-		Name:    "main.go",
+	mainGo := templatedFile{
+		Name: "main.go",
 		Content: `package main
 
 import (
@@ -80,14 +85,16 @@ func main() {
 	})
 }`,
 	}
-	templatedInitFiles = []templatedFile{
+	templatedInitFiles := []templatedFile{
 		pulumiYaml,
 		pulumiDevYaml,
 		pulumiNextYaml,
 		pulumiProdYaml,
 		mainGo,
 	}
-)
+
+	return templatedInitFiles, nil
+}
 
 // Init initializes a IaC module in the current directory.
 func Init(cmd *cobra.Command, args []string) error {
@@ -96,6 +103,11 @@ func Init(cmd *cobra.Command, args []string) error {
 	err := wgo.Init(nil, nil)
 	if err != nil {
 		return fmt.Errorf("error initializing Go module: %w", err)
+	}
+
+	templatedInitFiles, err := renderTemplates()
+	if err != nil {
+		return fmt.Errorf("error rendering templates: %w", err)
 	}
 
 	for _, file := range templatedInitFiles {
