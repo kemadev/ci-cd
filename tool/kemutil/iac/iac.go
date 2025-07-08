@@ -50,6 +50,8 @@ config:
 	pulumiDevYaml := templatedFile{
 		Name: "Pulumi." + StackNameDev + ".yaml",
 		Content: `config: {}
+backend:
+  url: file://./pulumi-backend
 `,
 	}
 	pulumiNextYaml := templatedFile{
@@ -67,23 +69,38 @@ config:
 		Content: `package main
 
 import (
-	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/s3"
+	"fmt"
+	"net/url"
+	"time"
+
+	"github.com/kemadev/infrastructure-components/pkg/k8s/basichttpapp"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		// Create an AWS resource (S3 Bucket)
-		bucket, err := s3.NewBucket(ctx, "s3Bucket", nil)
+		err := basichttpapp.DeployBasicHTTPApp(ctx, basichttpapp.AppParms{
+			AppNamespace:        "changeme",
+			AppComponent:        "changeme",
+			BusinessUnitId:      "changeme",
+			CustomerId:          "changeme",
+			CostCenter:          "changeme",
+			CostAllocationOwner: "changeme",
+			OperationsOwner:     "changeme",
+			Rpo:                 0 * time.Second,
+			MonitoringUrl: url.URL{
+				Scheme: "https",
+				Host:   "changeme",
+				Path:   "changeme",
+			},
+		})
 		if err != nil {
-			return err
+			return fmt.Errorf("error deploying basic HTTP app: %w", err)
 		}
-
-		// Export the name of the bucket
-		ctx.Export("bucketName", bucket.ID())
 		return nil
 	})
-}`,
+}
+`,
 	}
 	templatedInitFiles := []templatedFile{
 		pulumiYaml,
