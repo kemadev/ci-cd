@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -30,6 +31,8 @@ func GetGoModExpectedNameFromPath(path string) (string, error) {
 	if basePath == "" {
 		return "", fmt.Errorf("error getting git repository base path")
 	}
+
+	slog.Debug("Git base path found", slog.String("basePath", basePath))
 
 	repoRoot := path
 	for {
