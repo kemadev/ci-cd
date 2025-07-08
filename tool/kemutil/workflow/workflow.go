@@ -31,18 +31,15 @@ var (
 	Fix bool
 	// RunnerDebug is a flag to enable debug mode for the CI/CD runner.
 	RunnerDebug bool
-	dockerArgs  func(binary string) []string = func(binary string) []string {
-		return []string{
-			binary,
-			"run",
-			"--rm",
-			"--interactive",
-			"--tty",
-			"-v",
-			".:/src:Z",
-			"-v",
-			tmpDirBase + "/gitcreds:/home/nonroot/.netrc:Z",
-		}
+	dockerArgs  []string = []string{
+		"run",
+		"--rm",
+		"--interactive",
+		"--tty",
+		"-v",
+		".:/src:Z",
+		"-v",
+		tmpDirBase + "/gitcreds:/home/nonroot/.netrc:Z",
 	}
 	gitCredsTmpFilePath string = tmpDirBase + "/gitcreds"
 )
@@ -95,7 +92,7 @@ func Ci(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error preparing git credentials: %w", err)
 	}
 
-	baseArgs := dockerArgs(binary)
+	baseArgs := dockerArgs
 
 	if RunnerDebug {
 		slog.Debug("Debug mode is enabled, adding debug flag to base arguments")
@@ -138,7 +135,7 @@ func Custom(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error preparing git credentials: %w", err)
 	}
 
-	baseArgs := dockerArgs(binary)
+	baseArgs := dockerArgs
 
 	if RunnerDebug {
 		slog.Debug("Debug mode is enabled, adding debug flag to base arguments")
