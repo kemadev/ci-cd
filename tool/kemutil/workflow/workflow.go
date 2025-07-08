@@ -22,6 +22,7 @@ var (
 		Host: "ghcr.io",
 		Path: "kemadev/ci-cd-dev:latest",
 	}
+	tmpDirBase string = os.TempDir()
 )
 
 var (
@@ -29,6 +30,8 @@ var (
 	Hot bool
 	// Fix is a flag to enable fix mode.
 	Fix        bool
+	// RunnerDebug is a flag to enable debug mode for the CI/CD runner.
+	RunnerDebug bool
 	dockerArgs func(binary string) []string = func(binary string) []string {
 		return []string{
 			binary,
@@ -39,41 +42,48 @@ var (
 			"-v",
 			".:/src:Z",
 			"-v",
-			"/tmp/gitcreds:/home/nonroot/.netrc:Z",
+			tmpDirBase + "/gitcreds:/home/nonroot/.netrc:Z",
 		}
 	}
+	gitCredsTmpFilePath string = tmpDirBase + "/gitcreds"
 )
+
+const GitTokenEnvVarKey string = "GIT_TOKEN"
 
 func getImageURL() url.URL {
 	if Hot {
-		slog.Debug("Hot reload mode enabled", slog.Bool("hot", Hot))
+		slog.Debug("Hot reload mode enabled", slog.String("imageUrl", ciImageDevURL.String()))
 		return ciImageDevURL
 	}
-	slog.Debug("Hot reload mode not enabled", slog.Bool("hot", Hot))
+	slog.Debug("Hot reload mode not enabled", slog.String("imageUrl", ciImageDevURL.String()))
 	return ciImageProdURL
 }
 
 func prepareGitCredentials() error {
-	gitToken := os.Getenv("GIT_TOKEN")
+	gitToken := os.Getenv(GitTokenEnvVarKey)
 	if gitToken == "" {
-		return fmt.Errorf("GIT_TOKEN environment variable is not set")
+		return fmt.Errorf(GitTokenEnvVarKey + " environment variable is not set")
 	}
 
-	err := os.WriteFile("/tmp/gitcreds", []byte(
+	err := os.WriteFile(gitCredsTmpFilePath, []byte(
 		fmt.Sprintf("machine %s\nlogin git\npassword %s\n",
 			repotpl.RepoTemplateURL.Hostname(),
 			gitToken,
 		),
 	), 0o600)
 	if err != nil {
-		return fmt.Errorf("error writing git credentials to /tmp/gitcreds: %w", err)
+		return fmt.Errorf("error writing git credentials to "+gitCredsTmpFilePath+": %w", err)
 	}
+
+	slog.Debug("Git credentials prepared", slog.String("path", gitCredsTmpFilePath))
 
 	return nil
 }
 
 // Ci runs the CI workflows.
 func Ci(cmd *cobra.Command, args []string) error {
+	slog.Debug("Running workflow CI")
+
 	imageUrl := getImageURL()
 
 	binary, err := exec.LookPath("docker")
@@ -88,19 +98,20 @@ func Ci(cmd *cobra.Command, args []string) error {
 
 	baseArgs := dockerArgs(binary)
 
-	if Hot {
+	if RunnerDebug {
 		slog.Debug("Debug mode is enabled, adding debug flag to base arguments")
 		baseArgs = append(baseArgs, "-e", "RUNNER_DEBUG=1")
 	}
 
 	baseArgs = append(baseArgs, strings.TrimPrefix(imageUrl.String(), "//"))
 
-	slog.Info("Running CI tasks")
 	baseArgs = append(baseArgs, "ci")
 	if Fix {
 		baseArgs = append(baseArgs, "--fix")
 	}
-	slog.Debug("Executing CI task ci with base arguments", slog.Any("baseArgs", baseArgs))
+
+	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
+
 	syscall.Exec(
 		binary,
 		baseArgs,
@@ -112,6 +123,8 @@ func Ci(cmd *cobra.Command, args []string) error {
 
 // Custom runs custom commands using the CI/CD runner.
 func Custom(cmd *cobra.Command, args []string) error {
+	slog.Debug("Running workflow custom")
+
 	imageUrl := getImageURL()
 
 	binary, err := exec.LookPath("docker")
@@ -126,19 +139,21 @@ func Custom(cmd *cobra.Command, args []string) error {
 
 	baseArgs := dockerArgs(binary)
 
-	if Hot {
+	if RunnerDebug {
 		slog.Debug("Debug mode is enabled, adding debug flag to base arguments")
 		baseArgs = append(baseArgs, "-e", "RUNNER_DEBUG=1")
 	}
 
 	baseArgs = append(baseArgs, strings.TrimPrefix(imageUrl.String(), "//"))
 
-	slog.Info("Running custom CI task")
 	baseArgs = append(baseArgs, args...)
 	if Fix {
+		slog.Debug("Fix mode is enabled, adding fix flag to base arguments")
 		baseArgs = append(baseArgs, "--fix")
 	}
-	slog.Debug("Executing CI task custom with base arguments", slog.Any("baseArgs", baseArgs))
+
+	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
+
 	syscall.Exec(
 		binary,
 		baseArgs,

@@ -32,11 +32,15 @@ func Init(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("copier binary not found: %w", err)
 	}
 
+	baseArgs := []string{binary, "copy", RepoTemplateURL.String(), "."}
+	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
+
 	syscall.Exec(
 		binary,
-		[]string{binary, "copy", RepoTemplateURL.String(), "."},
+		baseArgs,
 		os.Environ(),
 	)
+
 	return nil
 }
 
@@ -54,10 +58,13 @@ func Update(cmd *cobra.Command, args []string) error {
 		slog.Debug("Skip answered questions enabled", slog.Bool("skipAnswered", SkipAnswered))
 		baseArgs = append(baseArgs, "--skip-answered")
 	}
+	slog.Debug("Running command", slog.Any("binary", binary), slog.Any("baseArgs", baseArgs))
+
 	syscall.Exec(
 		binary,
 		baseArgs,
 		os.Environ(),
 	)
+
 	return nil
 }
