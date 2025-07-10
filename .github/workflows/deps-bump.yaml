@@ -13,7 +13,10 @@ jobs:
   deps-bump:
     name: Dependencies bump
     permissions:
-      contents: read
+      contents: write
+      issues: write
+      pull-requests: write
+      workflows: write
       security-events: read
     runs-on: ubuntu-latest
     container:
@@ -36,5 +39,4 @@ jobs:
           RENOVATE_REPOSITORIES: "['kemadev/ci-cd']"
           RENOVATE_CONFIG_FILE: /tmp/renovate.yaml
           RENOVATE_PR_HOURLY_LIMIT: 10
-          RENOVATE_ONBOARDING: false
         run: /usr/local/sbin/renovate-entrypoint.sh
