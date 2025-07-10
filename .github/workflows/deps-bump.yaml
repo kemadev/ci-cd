@@ -27,5 +27,5 @@ jobs:
           RENOVATE_TOKEN: ${{ secrets.github_token }}
           RENOVATE_ENDPOINT: https://api.github.com
           RENOVATE_PLATFORM: github
-          RENOVATE_REPOSITORIES: "[kemadev/ci-cd]"
+          RENOVATE_REPOSITORIES: "['kemadev/ci-cd']"
         run: /usr/local/sbin/renovate-entrypoint.sh
