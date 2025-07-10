@@ -17,6 +17,7 @@ labels:
 vulnerabilityAlerts:
   addLabels:
     - type/security
+  vulnerabilityFixStrategy: highest
 postUpdateOptions:
   - gomodTidy
   - gomodUpdateImportPaths
