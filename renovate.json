@@ -3,10 +3,10 @@
 	"extends": [
 		"config:best-practices",
 		":semanticCommitTypeAll(chore)",
-		":semanticCommitScope(deps)"
+		":semanticCommitScope(deps)",
+		":separateMultipleMajorReleases"
 	],
 	"abandonmentThreshold": "180d",
-	"separateMultipleMajors": true,
 	"enabledManagers": [
 		"dockerfile",
 		"gomod",
