@@ -10,7 +10,8 @@
 	"enabledManagers": [
 		"dockerfile",
 		"gomod",
-		"github-actions"
+		"github-actions",
+		"copier"
 	],
 	"labels": [
 		"area/dependencies",
