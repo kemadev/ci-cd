@@ -16,7 +16,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-      workflows: write
+      # workflows: write
       security-events: read
     runs-on: ubuntu-latest
     container:
