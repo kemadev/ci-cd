@@ -2,8 +2,8 @@ name: Dependencies -  Bump versions
 
 on:
   schedule:
-    # Each day at 3:00 AM
-    - cron: 0 3 * * *
+    # Each hour
+    - cron: 0 * * * *
   workflow_dispatch: {}
 
 permissions:
@@ -30,5 +30,5 @@ jobs:
           RENOVATE_ENDPOINT: https://api.github.com
           RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: "['kemadev/ci-cd']"
-          RENOVATE_PR_HOURLY_LIMIT: 50
+          RENOVATE_PR_HOURLY_LIMIT: 10
         run: /usr/local/sbin/renovate-entrypoint.sh
