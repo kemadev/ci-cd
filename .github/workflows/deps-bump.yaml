@@ -26,7 +26,7 @@ jobs:
         env:
           GIT_REPOSITORY: ${{ github.repository }}
           GIT_BRANCH: ${{ github.ref_name }}
-        run: curl -sSL "https://raw.githubusercontent.com/${GIT_REPOSITORY}/${GIT_BRANCH}/config/renovate/renovate.yaml" -o /tmp/renovate.yaml
+        run: curl -fsSL "https://raw.githubusercontent.com/${GIT_REPOSITORY}/${GIT_BRANCH}/config/renovate/renovate.yaml" -o /tmp/renovate.yaml
       - name: Dependencies bump
         id: deps-bump
         env:
