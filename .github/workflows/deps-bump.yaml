@@ -25,11 +25,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
-      - uses: actions/create-github-app-token@v2
-        id: app-token
-        with:
-          app-id: ${{ vars.RENOVATE_APP_ID }}
-          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
       - name: Get Renovate config
         env:
           GIT_REPOSITORY: ${{ github.repository }}
@@ -38,7 +33,7 @@ jobs:
       - name: Dependencies bump
         id: deps-bump
         env:
-          RENOVATE_TOKEN: ${{ steps.app-token.outputs.token }}
+          RENOVATE_TOKEN: ${{ secrets.github_token }}
           RENOVATE_ENDPOINT: https://api.github.com
           RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: "['kemadev/ci-cd']"
