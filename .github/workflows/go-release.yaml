@@ -27,7 +27,6 @@ jobs:
       - name: Start buildkitd
         run: |
           nohup buildkitd > /tmp/buildkitd.log 2>&1 &
-          sleep 5
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
@@ -47,6 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/gitcreds"
+          cp /tmp/gitcreds "${HOME}/.netrc"
       - name: Go release
         id: go-release
         env:

@@ -1,0 +1,26 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:best-practices",
+		":semanticCommitTypeAll(chore)",
+		":semanticCommitScope(deps)"
+	],
+	"abandonmentThreshold": "180d",
+	"separateMultipleMajors": true,
+	"enabledManagers": [
+		"dockerfile",
+		"gomod",
+		"github-actions"
+	],
+	"labels": [
+		"area/dependencies",
+		"status/up-for-grabs",
+		"size/XS",
+		"complexity/low"
+	],
+	"vulnerabilityAlerts": {
+		"addLabels": [
+			"type/security"
+		]
+	}
+}

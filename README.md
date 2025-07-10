@@ -1,3 +1,18 @@
+<div align=center>
+  <img alt="Go - CD - main" src="https://github.com/kemadev/ci-cd/actions/workflows/go-cd.yaml/badge.svg?branch=main&event=push">
+  <img alt="Go - CD - next" src="https://github.com/kemadev/ci-cd/actions/workflows/go-cd.yaml/badge.svg?branch=next&event=push">
+  <img alt="Go - Release" src="https://github.com/kemadev/ci-cd/actions/workflows/go-release.yaml/badge.svg?event=push">
+  <img alt="Docker - CI" src="https://github.com/kemadev/ci-cd/actions/workflows/docker-ci.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Global - CI" src="https://github.com/kemadev/ci-cd/actions/workflows/global-ci.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Go - CI" src="https://github.com/kemadev/ci-cd/actions/workflows/go-ci.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Housekeeping - Repo template staleness check" src="https://github.com/kemadev/ci-cd/actions/workflows/repo-template-stale.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Housekeeping - Branches staleness check" src="https://github.com/kemadev/ci-cd/actions/workflows/branch-stale.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Housekeeping - Issues & PRs staleness housekeeping" src="https://github.com/kemadev/ci-cd/actions/workflows/issue-pr-stale.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Markdown - CI" src="https://github.com/kemadev/ci-cd/actions/workflows/markdown-ci.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Shell - CI" src="https://github.com/kemadev/ci-cd/actions/workflows/shell-ci.yaml/badge.svg?branch=main&event=schedule">
+  <img alt="Workflows - CI" src="https://github.com/kemadev/ci-cd/actions/workflows/workflow-action-ci.yaml/badge.svg?branch=main&event=schedule">
+</div>
+
 # ci-cd
 
 <!-- Brief description of the project -->
@@ -28,6 +43,11 @@
 - An application is a microservice that works with other microservices to to achieve project's goals
 - Microservices are small, loosely coupled, and independently deployable and scalable
 - Each microservice should be agnostic of it downstreams. However, it should expose a clear and well-defined API to its downstreams for them to consume (that is, the microservice itself uses its upstreams' API)
+
+### Documentation
+
+- Go code documentation is accessible thanks to [pkgsite](https://pkg.go.dev/golang.org/x/pkgsite/cmd/pkgsite)! Just run `pkgsite` in the root of the project to serve its documentation
+- Global project documentation is available in the [doc](./doc) directory
 
 ### Development Guidelines and Conventions
 
