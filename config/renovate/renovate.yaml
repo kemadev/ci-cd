@@ -21,3 +21,26 @@ vulnerabilityAlerts:
 postUpdateOptions:
   - gomodTidy
   - gomodUpdateImportPaths
+onboardingConfig:
+  extends:
+    - config:best-practices
+    - ":semanticCommitTypeAll(chore)"
+    - ":semanticCommitScope(deps)"
+    - ":separateMultipleMajorReleases"
+  abandonmentThreshold: "180d"
+  enabledManagers:
+    - dockerfile
+    - gomod
+    - github-actions
+  labels:
+    - area/dependencies
+    - status/up-for-grabs
+    - size/XS
+    - complexity/low
+  vulnerabilityAlerts:
+    addLabels:
+      - type/security
+    vulnerabilityFixStrategy: highest
+  postUpdateOptions:
+    - gomodTidy
+    - gomodUpdateImportPaths
