@@ -1,0 +1,34 @@
+name: Dependencies -  Bump versions
+
+on:
+  schedule:
+    # Each day at 3:00 AM
+    - cron: 0 3 * * *
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  deps-bump:
+    name: Dependencies bump
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/renovatebot/renovate:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+      - name: Copy Renovate config
+        run: |
+          cp config/renovate/renovate-config.js /usr/src/app/config.js
+      - name: Dependencies bump
+        id: deps-bump
+        env:
+          RENOVATE_TOKEN: ${{ secrets.github_token }}
+        run: /usr/local/sbin/renovate-entrypoint.sh

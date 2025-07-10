@@ -24,6 +24,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
       - name: PR title check
         id: pr-title-check
         env:

@@ -22,5 +22,9 @@
 		"addLabels": [
 			"type/security"
 		]
-	}
+	},
+	"postUpdateOptions": [
+		"gomodTidy",
+		"gomodUpdateImportPaths"
+	]
 }
