@@ -12,7 +12,6 @@ import (
 	"github.com/kemadev/ci-cd/internal/app/config"
 	"github.com/kemadev/ci-cd/internal/app/lint"
 	"github.com/kemadev/ci-cd/internal/app/pr"
-	"github.com/kemadev/ci-cd/internal/app/repotpl"
 	"github.com/kemadev/ci-cd/pkg/ci"
 	"github.com/kemadev/ci-cd/pkg/filesfind"
 	"github.com/kemadev/ci-cd/pkg/git"
@@ -24,24 +23,23 @@ var (
 )
 
 const (
-	CommandDocker            = "docker"
-	CommandGHA               = "gha"
-	CommandSecrets           = "secrets"
-	CommandSAST              = "sast"
-	CommandGoTest            = "go-test"
-	CommandGoCover           = "go-cover"
-	CommandGoModTidy         = "go-mod-tidy"
-	CommandGoModName         = "go-mod-name"
-	CommandGoLint            = "go-lint"
-	CommandDeps              = "deps"
-	CommandMarkdown          = "markdown"
-	CommandShell             = "shell"
-	CommandRelease           = "release"
-	CommandPRTitleCheck      = "pr-title-check"
-	CommandRepoTemplateStale = "repo-template-stale-check"
-	CommandBranchStaleCheck  = "branch-stale-check"
-	CommandCI                = "ci"
-	CommandHelp              = "help"
+	CommandDocker           = "docker"
+	CommandGHA              = "gha"
+	CommandSecrets          = "secrets"
+	CommandSAST             = "sast"
+	CommandGoTest           = "go-test"
+	CommandGoCover          = "go-cover"
+	CommandGoModTidy        = "go-mod-tidy"
+	CommandGoModName        = "go-mod-name"
+	CommandGoLint           = "go-lint"
+	CommandDeps             = "deps"
+	CommandMarkdown         = "markdown"
+	CommandShell            = "shell"
+	CommandRelease          = "release"
+	CommandPRTitleCheck     = "pr-title-check"
+	CommandBranchStaleCheck = "branch-stale-check"
+	CommandCI               = "ci"
+	CommandHelp             = "help"
 )
 
 //nolint:cyclop,funlen // the enormous switch is (hopefully) easily understandable for a human
@@ -827,26 +825,6 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		return 0, nil
 
-	case CommandRepoTemplateStale:
-		slog.Info(fmt.Sprintf("running %s", CommandRepoTemplateStale))
-		finding, err := repotpl.CheckRepoTemplateUpdate()
-		if err != nil {
-			return 1, fmt.Errorf("error checking stale repository template: %w", err)
-		}
-
-		if finding != (ci.Finding{}) {
-			err := ci.PrintFindings([]ci.Finding{finding}, lint.GetOutputFormat())
-			if err != nil {
-				return 1, fmt.Errorf("error printing findings: %w", err)
-			}
-
-			return 1, fmt.Errorf("stale repository template check failed: %s", finding.Message)
-		}
-
-		slog.Info("stale repository template check passed")
-
-		return 0, nil
-
 	case CommandBranchStaleCheck:
 		slog.Info(fmt.Sprintf("running %s", CommandBranchStaleCheck))
 		finding, err := branch.CheckStaleBranches()
@@ -953,9 +931,6 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		slog.Info("  " + CommandShell + " - Run Shell script linter")
 		slog.Info("  " + CommandRelease + " - Run release process")
 		slog.Info("  " + CommandPRTitleCheck + " - Check PR title format")
-		slog.Info(
-			"  " + CommandRepoTemplateStale + " - Check if repository template is stale",
-		)
 		slog.Info("  " + CommandBranchStaleCheck + " - Check for stale branches")
 		slog.Info("  " + CommandCI + " - Run all CI commands (mimics GitHub Pull Request CI)")
 		slog.Info("  " + CommandHelp + " - Show this help message")
