@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v1.0.0-21-gfa9a7ba
+_commit: v1.0.0-22-gcbd8e77
 _src_path: https://github.com/kemadev/repo-template
 codeowner_default: '@kemadev/maintainers'
 vcs_namespace: kemadev
