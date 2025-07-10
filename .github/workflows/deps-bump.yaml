@@ -38,5 +38,5 @@ jobs:
           RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: "['kemadev/ci-cd']"
           RENOVATE_CONFIG_FILE: /tmp/renovate.yaml
-          RENOVATE_PR_HOURLY_LIMIT: 10
+          RENOVATE_PR_HOURLY_LIMIT: 50
         run: /usr/local/sbin/renovate-entrypoint.sh
