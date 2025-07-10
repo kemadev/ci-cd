@@ -2,7 +2,9 @@ package repotpl
 
 import (
 	"fmt"
+	"io"
 	"regexp"
+	"strings"
 
 	"github.com/kemadev/ci-cd/pkg/ci"
 	kg "github.com/kemadev/ci-cd/pkg/git"
@@ -14,6 +16,7 @@ var (
 	)
 	ErrGitRepoNil                            = fmt.Errorf("git repository is nil")
 	ErrGitHeadNil                            = fmt.Errorf("git repository head is nil")
+	ErrGitTagsNil                            = fmt.Errorf("git repository tags is nil")
 	ErrRepoTemplateUpdateTrackerFileNoCommit = fmt.Errorf(
 		"repo template update tracker file has no commits",
 	)
@@ -35,16 +38,50 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		return ci.Finding{}, fmt.Errorf("error opening git repository: %w", ErrGitRepoNil)
 	}
 
-	tplHead, err := tplRepo.Head()
+	tplTags, err := tplRepo.Tags()
 	if err != nil {
-		return ci.Finding{}, fmt.Errorf("error getting repository head: %w", err)
+		return ci.Finding{}, fmt.Errorf("error getting repository tags: %w", err)
 	}
-	if tplHead == nil {
-		return ci.Finding{}, fmt.Errorf("error getting repository head: %w", ErrGitHeadNil)
+	if tplTags == nil {
+		return ci.Finding{}, fmt.Errorf("error getting repository tags: %w", ErrGitTagsNil)
 	}
 
-	tplLastHash := tplHead.Hash().String()
-	tplLastHash = tplLastHash[:7]
+	tplLastTag := ""
+	semverRegex := regexp.MustCompile(`^v\d+\.\d+\.\d+$`)
+	for {
+		tplTag, err := tplTags.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return ci.Finding{}, fmt.Errorf("error iterating repository tags: %w", err)
+		}
+		if tplTag == nil {
+			break
+		}
+
+		tagName := tplTag.Name().Short()
+		if semverRegex.MatchString(tagName) {
+			tagParts := strings.Split(tagName, ".")
+			if len(tagParts) != 3 {
+				return ci.Finding{}, fmt.Errorf(
+					"error parsing repository tag %s: expected format vX.Y.Z",
+					tagName,
+				)
+			}
+			lastTagParts := strings.Split(tplLastTag, ".")
+			if tplLastTag != "" && len(lastTagParts) != 3 {
+				return ci.Finding{}, fmt.Errorf(
+					"error parsing repository tag %s: expected format vX.Y.Z",
+					tagName,
+				)
+			}
+			if tplLastTag == "" || (tagParts[0] > lastTagParts[0] ||
+				(tagParts[0] == lastTagParts[0] && tagParts[1] > lastTagParts[1]) ||
+				(tagParts[0] == lastTagParts[0] && tagParts[1] == lastTagParts[1] && tagParts[2] > lastTagParts[2])) {
+				tplLastTag = tagName
+			}
+		}
+	}
 
 	repo, err := kg.GetGitRepo()
 	if err != nil {
@@ -110,7 +147,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		)
 	}
 
-	re := regexp.MustCompile(`(?m)^_commit:\s*([a-fA-F0-9]+)$`)
+	re := regexp.MustCompile(`(?m)^_commit:\s*(.+)$`)
 	matches := re.FindStringSubmatch(copierConfContent)
 	if len(matches) != 2 {
 		return ci.Finding{}, fmt.Errorf(
@@ -127,7 +164,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		)
 	}
 
-	if lastCommitHash != tplLastHash {
+	if lastCommitHash != tplLastTag {
 		return ci.Finding{
 			ToolName: "repo-template-updater",
 			FilePath: RepoTemplateUpdateTrackerFile,
@@ -135,7 +172,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 			RuleID:   "keep-repo-template-updated",
 			Message: fmt.Sprintf(
 				"New version of repository template is available (%s available, actually got %s). Please update the repository template to ensure you have the latest features and fixes.",
-				tplLastHash,
+				tplLastTag,
 				lastCommitHash,
 			),
 		}, nil
