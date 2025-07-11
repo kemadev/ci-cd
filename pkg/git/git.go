@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/caarlos0/svu/pkg/svu"
+	"github.com/caarlos0/svu/v3/pkg/svu"
 	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing/transport/http"
 	"github.com/go-git/go-git/v6/storage/memory"
