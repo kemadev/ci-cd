@@ -176,7 +176,7 @@ LABEL org.opencontainers.image.licenses="MPL-2.0"
 
 COPY ci-cd /usr/local/bin/kema-runner
 
-CMD ["/usr/local/bin/kema-runner"]
+ENTRYPOINT ["/usr/local/bin/kema-runner"]
 
 FROM --platform=${BUILDPLATFORM} clean-deps AS runner
 
