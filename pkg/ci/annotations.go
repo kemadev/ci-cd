@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -81,7 +82,7 @@ func PrintFindings(findings []Finding, format string) error {
 				githubAnnotation += fmt.Sprintf(",endColumn=%d", annotation.EndCol)
 			}
 
-			githubAnnotation += "::" + annotation.Message
+			githubAnnotation += "::" + strconv.Quote(annotation.Message)
 			fmt.Println(githubAnnotation)
 		}
 	default:
