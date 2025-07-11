@@ -416,6 +416,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--config",
 					"config/goreleaser/.goreleaser.yaml",
 					"--clean",
+					"--snapshot",
 				},
 				JsonInfo: ci.JsonInfos{
 					Type: "none",
