@@ -97,7 +97,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          rm -f /tmp/gitcreds || echo "Git credentials file removal failed" && exit 1
+          rm -f /tmp/gitcreds || { echo "Git credentials file removal failed" && exit 1; }
 
   go-check-mod-tidy:
     name: Go go.mod tidyness
