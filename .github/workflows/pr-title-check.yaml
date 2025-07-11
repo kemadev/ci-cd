@@ -31,4 +31,4 @@ jobs:
         id: pr-title-check
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: kema-runner pr-title-check "${PR_TITLE}"
+        run: pr-title-check "${PR_TITLE}"

@@ -26,4 +26,4 @@ jobs:
         uses: actions/checkout@v4
       - name: Branches staleness check
         id: branch-stale-check
-        run: kema-runner branch-stale-check
+        run: branch-stale-check

@@ -26,4 +26,4 @@ jobs:
         uses: actions/checkout@v4
       - name: Repo template staleness check
         id: repo-template-stale-check
-        run: kema-runner repo-template-stale-check
+        run: repo-template-stale-check
