@@ -70,6 +70,7 @@ type JsonInfos struct {
 	// "plain": Handle plain text output, where any output is considered a finding, with such finding
 	// being populated with the OverrideKey values from the jsonMappingInfo
 	// "stream": Handle JSON stream output, internally converted to simple JSON array
+	// "none": Do not parse output, do not treat it as finding
 	Type string
 	// Whether to read the JSON from stderr instead of stdout
 	ReadFromStderr bool

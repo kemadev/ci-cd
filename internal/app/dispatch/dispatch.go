@@ -948,12 +948,12 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		rc, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
-				Bin: "renovate",
+				Bin:     "renovate",
 				CliArgs: []string{},
+				JsonInfo: ci.JsonInfos{
+					Type: "none",
+				},
 			})
-		if rc != 0 {
-			return rc, fmt.Errorf("error running deps-bump, exit code: %d", rc)
-		}
 
 		return rc, err
 

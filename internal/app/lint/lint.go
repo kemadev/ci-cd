@@ -193,7 +193,13 @@ func handleLinterOutcome(
 
 	retCode := cmd.ProcessState.ExitCode()
 
-	if args.JsonInfo.Type == "plain" {
+	switch args.JsonInfo.Type {
+	case "none":
+		slog.Debug(
+			"No finding parsing requested, skipping",
+			slog.String("type", args.JsonInfo.Type),
+		)
+	case "plain":
 		if len(stdoutBuf.String()) == 0 {
 			return 0, nil
 		}
@@ -210,7 +216,7 @@ func handleLinterOutcome(
 			EndCol:    0,
 		}
 		findings = append(findings, f)
-	} else {
+	default:
 		var str string
 
 		if args.JsonInfo.ReadFromStderr {
