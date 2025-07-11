@@ -13,9 +13,7 @@ jobs:
   deps-bump:
     name: Dependencies bump
     permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+      contents: read
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/renovatebot/renovate:latest
@@ -26,7 +24,7 @@ jobs:
       - name: Dependencies bump
         id: deps-bump
         env:
-          RENOVATE_TOKEN: ${{ secrets.github_token }}
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_PAT }}
           RENOVATE_ENDPOINT: https://api.github.com
           RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: "['kemadev/ci-cd']"
