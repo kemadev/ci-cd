@@ -85,7 +85,7 @@ dockers:
       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
       - '--label=org.opencontainers.image.version={{ .Version }}'
   - image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-amd64'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-dev-amd64'
     use: buildx
     goos: linux
     goarch: amd64
@@ -105,7 +105,7 @@ dockers:
       - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
       - '--label=org.opencontainers.image.version={{ .Version }}'
   - image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-arm64'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-dev-arm64'
     use: buildx
     goos: linux
     goarch: arm64
@@ -132,14 +132,14 @@ docker_manifests:
     image_templates:
       - 'ghcr.io/kemadev/{{ .ProjectName }}:v{{ .Version }}-amd64'
       - 'ghcr.io/kemadev/{{ .ProjectName }}:v{{ .Version }}-arm64'
-  - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}'
+  - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-dev'
     image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-amd64'
-      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-arm64'
-  - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}-dev:latest'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-dev-amd64'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-dev-arm64'
+  - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:dev-latest'
     image_templates:
-      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-amd64'
-      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-arm64'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-dev-amd64'
+      - 'ghcr.io/kemadev/{{ .ProjectName }}-dev:v{{ .Version }}-dev-arm64'
 
 archives:
   - id: default
