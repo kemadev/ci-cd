@@ -30,6 +30,7 @@ const (
 	CommandSAST              = "sast"
 	CommandGoTest            = "go-test"
 	CommandGoCover           = "go-cover"
+	CommandGoBuild           = "go-build"
 	CommandGoModTidy         = "go-mod-tidy"
 	CommandGoModName         = "go-mod-name"
 	CommandGoLint            = "go-lint"
@@ -403,6 +404,25 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		}
 
 		return goRc, goErr
+
+	case CommandGoBuild:
+		slog.Info(fmt.Sprintf("running %s", CommandGoBuild))
+		rc, _, _, err := lint.RunLinter(
+			config,
+			lint.LinterArgs{
+				Bin: "goreleaser",
+				CliArgs: []string{
+					"build",
+					"--config",
+					"config/goreleaser/.goreleaser.yaml",
+					"--clean",
+				},
+				JsonInfo: ci.JsonInfos{
+					Type: "none",
+				},
+			})
+
+		return rc, err
 
 	case CommandGoModTidy:
 		slog.Info(fmt.Sprintf("running %s", CommandGoModTidy))
