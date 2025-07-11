@@ -34,4 +34,4 @@ jobs:
         uses: actions/checkout@v4
       - name: Dockerfiles lint
         id: dockerfile-lint
-        run: docker
+        run: kema-runner docker

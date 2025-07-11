@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Go unit test
         id: go-unit-test
-        run: go-test
+        run: kema-runner go-test
 
   go-test-coverage:
     name: Go test coverage
@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Go test coverage
         id: go-test-coverage
-        run: go-cover
+        run: kema-runner go-cover
 
   go-check-mod-tidy:
     name: Go go.mod tidyness
@@ -75,7 +75,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Go go.mod tidyness
         id: go-check-mod-tidy
-        run: go-mod-tidy
+        run: kema-runner go-mod-tidy
 
   go-check-mod-name:
     name: Go go.mod name
@@ -93,7 +93,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Go go.mod name
         id: go-check-mod-name
-        run: go-mod-name
+        run: kema-runner go-mod-name
 
   go-lint:
     name: Go lint
@@ -113,4 +113,4 @@ jobs:
         run: git config --global --add safe.directory "${GITHUB_WORKSPACE//\/home\/runner\/work\//\/__w\/}"
       - name: Go lint
         id: go-lint
-        run: go-lint
+        run: kema-runner go-lint

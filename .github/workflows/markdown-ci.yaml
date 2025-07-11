@@ -34,4 +34,4 @@ jobs:
         uses: actions/checkout@v4
       - name: Markdown lint
         id: markdown-lint
-        run: markdown
+        run: kema-runner markdown

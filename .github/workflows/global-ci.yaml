@@ -34,7 +34,7 @@ jobs:
         run: git config --global --add safe.directory "${GITHUB_WORKSPACE//\/home\/runner\/work\//\/__w\/}"
       - name: Secrets scan
         id: secrets-scan
-        run: secrets
+        run: kema-runner secrets
 
   deps-scan:
     name: Dependencies scan
@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Dependencies scan
         id: deps-scan
-        run: deps
+        run: kema-runner deps
 
   sast:
     name: Static Application Security Testing
@@ -70,4 +70,4 @@ jobs:
         uses: actions/checkout@v4
       - name: Static Application Security Testing
         id: sast
-        run: sast
+        run: kema-runner sast
