@@ -59,6 +59,46 @@ jobs:
         id: go-test-coverage
         run: kema-runner go-cover
 
+  go-build:
+    name: Go build
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/kemadev/ci-cd:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+      - name: Set git safe directory
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE//\/home\/runner\/work\//\/__w\/}"
+      - name: Login to GitHub Packages
+        env:
+          USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "${GITHUB_TOKEN}" | docker login ghcr.io --username "${USERNAME}" --password-stdin
+      - name: Create git secrets
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
+        run: |
+          echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/gitcreds"
+          cp /tmp/gitcreds "${HOME}/.netrc"
+      - name: Go build
+        id: go-build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          kema-runner go-build
+      - name: Clean up
+        if: always()
+        shell: bash
+        run: |
+          rm -f /tmp/gitcreds || echo "Git credentials file removal failed" && exit 1
+
   go-check-mod-tidy:
     name: Go go.mod tidyness
     permissions:
