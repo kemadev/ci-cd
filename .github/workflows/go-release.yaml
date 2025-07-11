@@ -38,19 +38,19 @@ jobs:
       - name: Login to GitHub Packages
         env:
           USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
         run: echo "${GITHUB_TOKEN}" | docker login ghcr.io --username "${USERNAME}" --password-stdin
       - name: Create git secrets
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
         run: |
           echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/gitcreds"
           cp /tmp/gitcreds "${HOME}/.netrc"
       - name: Go release
         id: go-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
         run: |
           kema-runner release
       - name: Clean up
