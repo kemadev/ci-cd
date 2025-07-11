@@ -82,7 +82,10 @@ func PrintFindings(findings []Finding, format string) error {
 				githubAnnotation += fmt.Sprintf(",endColumn=%d", annotation.EndCol)
 			}
 
-			githubAnnotation += "::" + strconv.Quote(annotation.Message)
+			quotedMessage := strconv.Quote(annotation.Message)
+			escapedMessage := quotedMessage[1 : len(quotedMessage)-1]
+			githubAnnotation += "::" + escapedMessage
+
 			fmt.Println(githubAnnotation)
 		}
 	default:
