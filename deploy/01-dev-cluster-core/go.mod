@@ -3,7 +3,7 @@ module github.com/kemadev/ci-cd/deploy/01-dev-cluster-core
 go 1.24.2
 
 require (
-	github.com/kemadev/infrastructure-components v0.0.0-20250703131629-8ba6f0fa045c
+	github.com/kemadev/infrastructure-components v0.0.0-20250711153913-d6def4e51aee
 	github.com/pulumi/pulumi/sdk/v3 v3.181.0
 )
 
@@ -40,7 +40,7 @@ require (
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/hcl/v2 v2.23.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.24.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
