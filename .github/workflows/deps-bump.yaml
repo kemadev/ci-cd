@@ -16,11 +16,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/renovatebot/renovate:latest
+      image: ghcr.io/kemadev/ci-cd:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
       - name: Dependencies bump
         id: deps-bump
         env:
@@ -29,4 +32,4 @@ jobs:
           RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: "['kemadev/ci-cd']"
           RENOVATE_PR_HOURLY_LIMIT: 10
-        run: /usr/local/sbin/renovate-entrypoint.sh
+        run: kema-runner deps-bump
