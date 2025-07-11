@@ -174,7 +174,7 @@ LABEL org.opencontainers.image.source="https://github.com/kemadev/ci-cd"
 LABEL org.opencontainers.image.vendor="kemadev"
 LABEL org.opencontainers.image.licenses="MPL-2.0"
 
-COPY {{ vcs_repo }} /usr/local/bin/kema-runner
+COPY ci-cd /usr/local/bin/kema-runner
 
 CMD ["/usr/local/bin/kema-runner"]
 
