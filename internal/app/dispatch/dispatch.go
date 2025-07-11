@@ -952,7 +952,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				CliArgs: []string{},
 			})
 		if rc != 0 {
-			return rc, fmt.Errorf("error running goreleaser, exit code: %d", rc)
+			return rc, fmt.Errorf("error running deps-bump, exit code: %d", rc)
 		}
 
 		return rc, err
