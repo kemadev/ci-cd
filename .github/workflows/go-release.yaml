@@ -38,7 +38,7 @@ jobs:
       - name: Login to GitHub Packages
         env:
           USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "${GITHUB_TOKEN}" | docker login ghcr.io --username "${USERNAME}" --password-stdin
       - name: Create git secrets
         shell: bash
@@ -50,7 +50,7 @@ jobs:
       - name: Go release
         id: go-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           kema-runner release
       - name: Clean up
