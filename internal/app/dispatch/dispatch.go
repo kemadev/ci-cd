@@ -41,6 +41,7 @@ const (
 	CommandRepoTemplateStale = "repo-template-stale-check"
 	CommandBranchStaleCheck  = "branch-stale-check"
 	CommandCI                = "ci"
+	CommandDepsBump          = "deps-bump"
 	CommandHelp              = "help"
 )
 
@@ -936,6 +937,25 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		slog.Info("All commands succeeded")
 
 		return 0, nil
+
+	case CommandDepsBump:
+		slog.Info(fmt.Sprintf("running %s", CommandDepsBump))
+
+		if config.DebugEnabled {
+			os.Setenv("LOG_LEVEL", "debug")
+		}
+
+		rc, _, _, err := lint.RunLinter(
+			config,
+			lint.LinterArgs{
+				Bin: "renovate",
+				CliArgs: []string{},
+			})
+		if rc != 0 {
+			return rc, fmt.Errorf("error running goreleaser, exit code: %d", rc)
+		}
+
+		return rc, err
 
 	case "help":
 		slog.Info("Available commands:")

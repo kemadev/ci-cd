@@ -57,6 +57,7 @@ ARG TARGETARCH
 ARG HELM_VERSION=v3.17.3
 ARG RELEASE_PLEASE_VERSION=17.0.0
 ARG MARKDOWNLINT_VERSION=0.44.0
+ARG RENOVATE_VERSION=41.30.5
 ARG SEMGREP_VERSION=1.119.0
 
 # hadolint ignore=DL4006
@@ -64,7 +65,7 @@ RUN curl -sSL "https://get.helm.sh/helm-${HELM_VERSION}-${TARGETOS}-${TARGETARCH
 
 COPY --link --from=dep-nodejs /usr/local /usr/local
 
-RUN npm --cache=false install --global "release-please@${RELEASE_PLEASE_VERSION}" "markdownlint-cli@${MARKDOWNLINT_VERSION}"
+RUN npm --cache=false install --global "release-please@${RELEASE_PLEASE_VERSION}" "markdownlint-cli@${MARKDOWNLINT_VERSION}" "renovate@${RENOVATE_VERSION}"
 
 COPY --link --from=dep-python /usr/local/ /usr/local/
 
@@ -72,8 +73,7 @@ RUN pip install --no-cache-dir "semgrep==${SEMGREP_VERSION}"
 
 FROM --platform=${BUILDPLATFORM} dep-nodejs AS nodejs-deps
 
-RUN mkdir /go && \
-	rm -rf /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/docker-entrypoint.sh
+RUN rm -rf /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/docker-entrypoint.sh
 
 FROM --platform=${BUILDPLATFORM} base-deps AS clean-deps
 
@@ -94,7 +94,9 @@ COPY --link --from=misc-deps /usr/local/lib/ /usr/local/lib/
 COPY --link --from=misc-deps /usr/local/bin/helm /usr/local/bin/helm
 COPY --link --from=misc-deps /usr/local/bin/pysemgrep /usr/local/bin/semgrep
 
-RUN ln -s /usr/local/lib/node_modules/release-please/build/src/bin/release-please.js /usr/local/bin/release-please && ln -s /usr/local/lib/node_modules/markdownlint-cli/markdownlint.js /usr/local/bin/markdownlint
+RUN ln -s /usr/local/lib/node_modules/release-please/build/src/bin/release-please.js /usr/local/bin/release-please && \
+	ln -s /usr/local/lib/node_modules/markdownlint-cli/markdownlint.js /usr/local/bin/markdownlint && \
+	ln -s /usr/local/lib/node_modules/renovate/dist/renovate.js /usr/local/bin/renovate
 
 ENV GOROOT=/usr/local/go
 ENV GOPATH=/go
