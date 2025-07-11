@@ -3,13 +3,13 @@ module github.com/kemadev/ci-cd
 go 1.24.2
 
 require (
-	github.com/caarlos0/svu v1.12.0
+	github.com/caarlos0/svu/v2 v2.2.0
 	github.com/go-git/go-git/v6 v6.0.0-20250707060505-4ae913c9492e
 )
 
 require (
 	dario.cat/mergo v1.0.2 // indirect
-	github.com/Masterminds/semver v1.5.0 // indirect
+	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.3.0 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
