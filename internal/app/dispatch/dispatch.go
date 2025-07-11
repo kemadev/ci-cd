@@ -461,7 +461,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 								),
 							},
 							Message: ci.JsonMappingInfo{
-								OverrideValue: "Unused dependencies found in go.mod",
+								OverrideValue: "Unused dependencies found in " + mod,
 							},
 						},
 					},
