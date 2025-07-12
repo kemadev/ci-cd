@@ -21,6 +21,7 @@ var (
 	ErrGitRepoNil                            = fmt.Errorf("git repository is nil")
 	ErrGitHeadNil                            = fmt.Errorf("git repository head is nil")
 	ErrGitTagsNil                            = fmt.Errorf("git repository tags is nil")
+	ErrGitTagsMalformed                      = fmt.Errorf("git repository tags are malformed")
 	ErrRepoTemplateUpdateTrackerFileNoCommit = fmt.Errorf(
 		"repo template update tracker file has no commits",
 	)
@@ -72,16 +73,18 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 			tagParts := strings.Split(tagName, ".")
 			if len(tagParts) != 3 {
 				return ci.Finding{}, fmt.Errorf(
-					"error parsing repository tag %s: expected format vX.Y.Z",
+					"tag %s: expected format vX.Y.Z: %w",
 					tagName,
+					ErrGitTagsMalformed,
 				)
 			}
 
 			lastTagParts := strings.Split(tplLastTag, ".")
 			if tplLastTag != "" && len(lastTagParts) != 3 {
 				return ci.Finding{}, fmt.Errorf(
-					"error parsing repository tag %s: expected format vX.Y.Z",
+					"tag %s: expected format vX.Y.Z: %w",
 					tagName,
+					ErrGitTagsMalformed,
 				)
 			}
 

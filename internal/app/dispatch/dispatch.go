@@ -21,6 +21,9 @@ import (
 var (
 	ErrUnknownCommand    = fmt.Errorf("unknown command")
 	ErrNoCommandProvided = fmt.Errorf("no command provided")
+	ErrExitCodeNotZero   = fmt.Errorf("exit code is not zero")
+	ErrFindingFound      = fmt.Errorf("finding found")
+	ErrCommandFailed     = fmt.Errorf("command failed")
 )
 
 const (
@@ -844,7 +847,11 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				},
 			})
 		if rc != 0 {
-			return rc, fmt.Errorf("error running goreleaser, exit code: %d", rc)
+			return rc, fmt.Errorf(
+				"error running goreleaser: exit code %d: %w",
+				rc,
+				ErrExitCodeNotZero,
+			)
 		}
 
 		return rc, err
@@ -863,7 +870,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				return 1, fmt.Errorf("error printing findings: %w", err)
 			}
 
-			return 1, fmt.Errorf("pr title check failed: %s", finding.Message)
+			return 1, fmt.Errorf("pr title check failed: %s: %w", finding.Message, ErrFindingFound)
 		}
 
 		slog.Info("pr title check passed")
@@ -884,7 +891,11 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				return 1, fmt.Errorf("error printing findings: %w", err)
 			}
 
-			return 1, fmt.Errorf("stale repository template check failed: %s", finding.Message)
+			return 1, fmt.Errorf(
+				"stale repository template check failed: %s: %w",
+				finding.Message,
+				ErrFindingFound,
+			)
 		}
 
 		slog.Info("stale repository template check passed")
@@ -905,7 +916,11 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				return 1, fmt.Errorf("error printing findings: %w", err)
 			}
 
-			return 1, fmt.Errorf("stale branches check failed: %s", finding.Message)
+			return 1, fmt.Errorf(
+				"stale branches check failed: %s: %w",
+				finding.Message,
+				ErrFindingFound,
+			)
 		}
 
 		slog.Info("stale branches check passed")
@@ -975,8 +990,9 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		if goRc != 0 {
 			return goRc, fmt.Errorf(
-				"one or more commands failed: %s",
+				"one or more commands failed: %s: %w",
 				strings.Join(failedCommands, ", "),
+				ErrCommandFailed,
 			)
 		}
 
@@ -1029,6 +1045,6 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		return 0, nil
 
 	default:
-		return 1, fmt.Errorf("unknown command: %s", args[0])
+		return 1, fmt.Errorf("command %s: %w", args[0], ErrUnknownCommand)
 	}
 }

@@ -285,11 +285,12 @@ func handleKeyType(jsonm map[string]any, key string) map[string]any {
 			return nil
 		}
 
-		if m, ok := value[0].(map[string]any); ok {
+		m, ok := value[0].(map[string]any)
+		if ok {
 			return m
 		}
 
-		handleKeyType(value[0].(map[string]any), key)
+		handleKeyType(m, key)
 
 		return nil
 	case string:
@@ -420,12 +421,7 @@ func setStringValue(
 
 			*field = strings.Join(values, " - ")
 		case any:
-			val, ok := jsonTargetKey[mapInfo.Key].(any)
-			if !ok {
-				return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
-			}
-
-			*field = fmt.Sprintf("%v", val)
+			*field = fmt.Sprintf("%v", jsonTargetKey[mapInfo.Key])
 		default:
 			return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
 		}

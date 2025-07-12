@@ -15,10 +15,11 @@ import (
 )
 
 var (
-	ErrGitRepoNil     = fmt.Errorf("git repository is nil")
-	ErrBranchesNil    = fmt.Errorf("branches are nil")
-	ErrCurrBrancheNil = fmt.Errorf("current branch is nil")
-	ErrCommitNil      = fmt.Errorf("commit object is nil")
+	ErrGitRepoNil      = fmt.Errorf("git repository is nil")
+	ErrBranchesNil     = fmt.Errorf("branches are nil")
+	ErrCurrBrancheNil  = fmt.Errorf("current branch is nil")
+	ErrCommitNil       = fmt.Errorf("commit object is nil")
+	ErrRemoteOriginNil = fmt.Errorf("remote is nil")
 )
 
 // StaleBranchThreshold is the threshold for a branch to be considered stale.
@@ -116,7 +117,7 @@ func CheckStaleBranches() (ci.Finding, error) {
 		}
 
 		if remote == nil {
-			return ci.Finding{}, fmt.Errorf("remote origin is empty")
+			return ci.Finding{}, ErrRemoteOriginNil
 		}
 
 		repoUrlString := remote.Config().URLs[0]

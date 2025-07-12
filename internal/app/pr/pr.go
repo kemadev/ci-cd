@@ -12,9 +12,14 @@ import (
 	"github.com/kemadev/ci-cd/pkg/ci"
 )
 
+var (
+	ErrPRTitleInvalid = fmt.Errorf("invalid PR title")
+	ErrPRTitleNil     = fmt.Errorf("PR title is nil")
+)
+
 func CheckPRTitle(args []string) (ci.Finding, error) {
 	if len(args) < 3 {
-		return ci.Finding{}, fmt.Errorf("pr title is required")
+		return ci.Finding{}, ErrPRTitleNil
 	}
 
 	prTitle := strings.Join(args[2:], " ")
