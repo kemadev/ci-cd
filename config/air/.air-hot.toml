@@ -1,0 +1,16 @@
+[build]
+cmd = "echo oui"
+bin = "/usr/local/bin/kema-runner"
+# Use arguments passed at runtime to the binary
+args_bin = ["${@}"]
+
+# Send interrupt before kill
+send_interrupt = true
+# Delay before killing (ns)
+kill_delay = 250
+# Do not delete binary on failure
+stop_on_error = false
+
+[screen]
+clear_on_rebuild = true
+keep_scroll = false
