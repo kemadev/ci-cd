@@ -16,10 +16,14 @@ func NewConfig() *Config {
 	silentEnabled := os.Getenv("RUNNER_SILENT") == "1"
 	debugEnabled := os.Getenv("RUNNER_DEBUG") == "1"
 
+	slog.Error("Initializing config",
+		slog.Bool("silentEnabled", silentEnabled),
+		slog.Bool("debugEnabled", debugEnabled),
+	)
+
 	if silentEnabled {
 		logLevel = slog.LevelError
-	}
-	if debugEnabled {
+	} else if debugEnabled {
 		logLevel = slog.LevelDebug
 	} else {
 		logLevel = slog.LevelInfo
