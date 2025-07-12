@@ -24,11 +24,11 @@ type Finding struct {
 	Message   string `json:"message"`
 }
 
-type JsonToFindingsMappings struct {
+type JSONToFindingsMappings struct {
 	// Key containing the array of findings in which to search using jsonMappingInfo
 	BaseArrayKey string
-	ToolName     JsonMappingInfo
-	RuleID       JsonMappingInfo
+	ToolName     JSONMappingInfo
+	RuleID       JSONMappingInfo
 	// Severity level of the finding, valid values are `debug`, `notice`, `warning`, `error`
 	// Based on GitHub workflow commands, see https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-a-debug-message
 	// Other common values are mapped automatically:
@@ -37,16 +37,16 @@ type JsonToFindingsMappings struct {
 	// `medium` -> `warning`
 	// `critical` -> `error`
 	// `high` -> `error`
-	Level     JsonMappingInfo
-	FilePath  JsonMappingInfo
-	StartLine JsonMappingInfo
-	EndLine   JsonMappingInfo
-	StartCol  JsonMappingInfo
-	EndCol    JsonMappingInfo
-	Message   JsonMappingInfo
+	Level     JSONMappingInfo
+	FilePath  JSONMappingInfo
+	StartLine JSONMappingInfo
+	EndLine   JSONMappingInfo
+	StartCol  JSONMappingInfo
+	EndCol    JSONMappingInfo
+	Message   JSONMappingInfo
 }
 
-type JsonMappingInfo struct {
+type JSONMappingInfo struct {
 	// JSON key to find, can use dot notation to find nested keys like `foo.bar.baz`. Keys whose value is a string array will be
 	// converted to a string by joining the values with " - ".
 	Key string
@@ -64,10 +64,10 @@ type JsonMappingInfo struct {
 	// Can be used to compose a value from multiple sources, like <mapping1 result><mapping2 result><mapping3 result>
 	// Use in conjunction with OverrideKey to set constant values
 	// Only enabled for string values
-	Suffix *JsonMappingInfo
+	Suffix *JSONMappingInfo
 }
 
-type JsonInfos struct {
+type JSONInfos struct {
 	// Type or linter output to parse
 	// Default is handling json array of findings
 	// "plain": Handle plain text output, where any output is considered a finding, with such finding
@@ -77,7 +77,7 @@ type JsonInfos struct {
 	Type string
 	// Whether to read the JSON from stderr instead of stdout
 	ReadFromStderr bool
-	Mappings       JsonToFindingsMappings
+	Mappings       JSONToFindingsMappings
 }
 
 var (
@@ -91,7 +91,7 @@ var (
 	ErrJSONNoSuchKey       = fmt.Errorf("json does not contain key")
 )
 
-func FindingsFromJSON(str string, jsonInfo JsonInfos) ([]Finding, error) {
+func FindingsFromJSON(str string, jsonInfo JSONInfos) ([]Finding, error) {
 	if str == "" {
 		return nil, nil
 	}
@@ -160,12 +160,12 @@ func FindingsFromJSON(str string, jsonInfo JsonInfos) ([]Finding, error) {
 
 func findingFromJSONObject(
 	jsonm map[string]any,
-	mappings JsonToFindingsMappings,
+	mappings JSONToFindingsMappings,
 ) (bool, Finding, error) {
 	var finding Finding
 
 	mappingFields := []struct {
-		mapping JsonMappingInfo
+		mapping JSONMappingInfo
 		field   any
 	}{
 		{mappings.ToolName, &finding.ToolName},
@@ -205,7 +205,7 @@ func findingFromJSONObject(
 	return true, finding, nil
 }
 
-func applyGlobalSelector(jsonm map[string]any, mapInfo JsonMappingInfo) (bool, error) {
+func applyGlobalSelector(jsonm map[string]any, mapInfo JSONMappingInfo) (bool, error) {
 	if jsonm[mapInfo.Key] == nil {
 		return false, nil
 	}
@@ -234,7 +234,7 @@ func applyGlobalSelector(jsonm map[string]any, mapInfo JsonMappingInfo) (bool, e
 
 func setValue(
 	jsonm map[string]any,
-	mapInfo JsonMappingInfo,
+	mapInfo JSONMappingInfo,
 	field any,
 ) (bool, error) {
 	jsonTargetKey := jsonm
@@ -323,7 +323,7 @@ func globalSelectFromRegex(str, regex string) (bool, error) {
 	return exp.MatchString(str), nil
 }
 
-func getDefaultStringValue(i JsonMappingInfo, defaultValue string) string {
+func getDefaultStringValue(i JSONMappingInfo, defaultValue string) string {
 	if i.OverrideValue != "" {
 		return i.OverrideValue
 	}
@@ -335,7 +335,7 @@ func getDefaultStringValue(i JsonMappingInfo, defaultValue string) string {
 	return defaultValue
 }
 
-func getDefaultIntValue(i JsonMappingInfo, defaultValue int) int {
+func getDefaultIntValue(i JSONMappingInfo, defaultValue int) int {
 	if i.Key == "" {
 		return defaultValue
 	}
@@ -364,54 +364,34 @@ func applyValueTransformerRegex(val, regex string) (string, error) {
 func setStringValue(
 	jsonTargetKey map[string]any,
 	jsonm map[string]any,
-	mapInfo JsonMappingInfo,
+	mapInfo JSONMappingInfo,
 	field *string,
 ) error {
 	*field = getDefaultStringValue(mapInfo, mapInfo.DefaultValue)
 
 	if mapInfo.OverrideValue == "" {
-		switch jsonTargetKey[mapInfo.Key].(type) {
+		switch val := jsonTargetKey[mapInfo.Key].(type) {
 		case nil:
-			slog.Debug(fmt.Sprintf("key %s not found in json %s", mapInfo.Key, jsonTargetKey))
+			slog.Debug("key not found in json", slog.String("key", mapInfo.Key), slog.Any("json", jsonTargetKey))
 
 			return nil
 		case string:
-			val, ok := jsonTargetKey[mapInfo.Key].(string)
-			if !ok {
-				return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
-			}
-
 			*field = val
 		case int:
-			val, ok := jsonTargetKey[mapInfo.Key].(int)
-			if !ok {
-				return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
-			}
-
 			*field = strconv.Itoa(val)
 		case float64:
-			val, ok := jsonTargetKey[mapInfo.Key].(float64)
-			if !ok {
-				return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
-			}
-
 			*field = strconv.Itoa(int(val))
 		case bool:
-			val, ok := jsonTargetKey[mapInfo.Key].(bool)
-			if !ok {
-				return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
-			}
-
 			if val {
 				*field = "true"
 			} else {
 				*field = "false"
 			}
 		case []any:
-			// perform aggregation
+			// Perform aggregation
 			var values []string
 
-			for _, v := range jsonTargetKey[mapInfo.Key].([]any) {
+			for _, v := range val {
 				if str, ok := v.(string); ok {
 					values = append(values, str)
 				} else {
@@ -421,7 +401,7 @@ func setStringValue(
 
 			*field = strings.Join(values, " - ")
 		case any:
-			*field = fmt.Sprintf("%v", jsonTargetKey[mapInfo.Key])
+			*field = fmt.Sprintf("%v", val)
 		default:
 			return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
 		}
@@ -448,7 +428,7 @@ func setStringValue(
 	return nil
 }
 
-func setIntValue(jsonm map[string]any, mapInfo JsonMappingInfo, field *int) error {
+func setIntValue(jsonm map[string]any, mapInfo JSONMappingInfo, field *int) error {
 	var def int
 
 	if mapInfo.DefaultValue != "" {

@@ -50,7 +50,7 @@ const (
 )
 
 //nolint:cyclop,funlen // the enormous switch is (hopefully) easily understandable for a human
-func DispatchCommand(config *config.Config, args []string) (int, error) {
+func Run(config *config.Config, args []string) (int, error) {
 	gitRepoBasePath, err := git.GetGitBasePath()
 	if err != nil {
 		return 1, fmt.Errorf("error getting git base path: %w", err)
@@ -77,7 +77,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 	case CommandDocker:
 		slog.Info("running " + CommandDocker)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "hadolint",
@@ -89,36 +89,36 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--format",
 					"json",
 				},
-				JsonInfo: ci.JsonInfos{
-					Mappings: ci.JsonToFindingsMappings{
-						ToolName: ci.JsonMappingInfo{
+				JSONInfo: ci.JSONInfos{
+					Mappings: ci.JSONToFindingsMappings{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "hadolint",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "code",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							Key: "level",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "file",
 						},
-						StartLine: ci.JsonMappingInfo{
+						StartLine: ci.JSONMappingInfo{
 							Key: "line",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "message",
 						},
 					},
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandDocker+": %w", err)
 
 	case CommandGHA:
 		slog.Info("running " + CommandGHA)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "actionlint",
@@ -131,39 +131,39 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"-format",
 					"{{json .}}",
 				},
-				JsonInfo: ci.JsonInfos{
-					Mappings: ci.JsonToFindingsMappings{
-						ToolName: ci.JsonMappingInfo{
+				JSONInfo: ci.JSONInfos{
+					Mappings: ci.JSONToFindingsMappings{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "gha-actionlint",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "kind",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							OverrideValue: "warning",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "filepath",
 						},
-						StartLine: ci.JsonMappingInfo{
+						StartLine: ci.JSONMappingInfo{
 							Key: "line",
 						},
-						StartCol: ci.JsonMappingInfo{
+						StartCol: ci.JSONMappingInfo{
 							Key: "col",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "message",
 						},
 					},
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandGHA+": %w", err)
 
 	case CommandSecrets:
 		slog.Info("running " + CommandSecrets)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "gitleaks",
@@ -180,45 +180,45 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--report-path",
 					"-",
 				},
-				JsonInfo: ci.JsonInfos{
-					Mappings: ci.JsonToFindingsMappings{
-						ToolName: ci.JsonMappingInfo{
+				JSONInfo: ci.JSONInfos{
+					Mappings: ci.JSONToFindingsMappings{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "secrets-gitleaks",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "RuleID",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							OverrideValue: "error",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "File",
 						},
-						StartLine: ci.JsonMappingInfo{
+						StartLine: ci.JSONMappingInfo{
 							Key: "StartLine",
 						},
-						EndLine: ci.JsonMappingInfo{
+						EndLine: ci.JSONMappingInfo{
 							Key: "EndLine",
 						},
-						StartCol: ci.JsonMappingInfo{
+						StartCol: ci.JSONMappingInfo{
 							Key: "StartColumn",
 						},
-						EndCol: ci.JsonMappingInfo{
+						EndCol: ci.JSONMappingInfo{
 							Key: "EndColumn",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "Description",
 						},
 					},
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandSecrets+": %w", err)
 
 	case CommandSAST:
 		slog.Info("running " + CommandSAST)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "semgrep",
@@ -244,41 +244,41 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--config",
 					"p/dockerfile",
 				},
-				JsonInfo: ci.JsonInfos{
-					Mappings: ci.JsonToFindingsMappings{
+				JSONInfo: ci.JSONInfos{
+					Mappings: ci.JSONToFindingsMappings{
 						BaseArrayKey: "results",
-						ToolName: ci.JsonMappingInfo{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "sast-semgrep",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "check_id",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							Key: "extra.severity",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "path",
 						},
-						StartLine: ci.JsonMappingInfo{
+						StartLine: ci.JSONMappingInfo{
 							Key: "start.line",
 						},
-						EndLine: ci.JsonMappingInfo{
+						EndLine: ci.JSONMappingInfo{
 							Key: "end.line",
 						},
-						StartCol: ci.JsonMappingInfo{
+						StartCol: ci.JSONMappingInfo{
 							Key: "start.col",
 						},
-						EndCol: ci.JsonMappingInfo{
+						EndCol: ci.JSONMappingInfo{
 							Key: "end.col",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "extra.message",
 						},
 					},
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandSAST+": %w", err)
 
 	case CommandGoTest:
 		slog.Info("running " + CommandGoTest)
@@ -304,37 +304,37 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						"-race",
 						"./...",
 					},
-					JsonInfo: ci.JsonInfos{
+					JSONInfo: ci.JSONInfos{
 						Type: "stream",
-						Mappings: ci.JsonToFindingsMappings{
-							ToolName: ci.JsonMappingInfo{
+						Mappings: ci.JSONToFindingsMappings{
+							ToolName: ci.JSONMappingInfo{
 								OverrideValue: "go-test",
 							},
-							RuleID: ci.JsonMappingInfo{
+							RuleID: ci.JSONMappingInfo{
 								OverrideValue: "no-failing-test",
 							},
-							Level: ci.JsonMappingInfo{
+							Level: ci.JSONMappingInfo{
 								OverrideValue: "error",
 							},
-							FilePath: ci.JsonMappingInfo{
+							FilePath: ci.JSONMappingInfo{
 								Key: "Package",
 								// Get path relative to git repo base path
 								ValueTransformerRegex: gitRepoBasePath + "/(.*)",
-								Suffix: &ci.JsonMappingInfo{
+								Suffix: &ci.JSONMappingInfo{
 									// Add a /
 									OverrideValue: "/",
-									Suffix: &ci.JsonMappingInfo{
+									Suffix: &ci.JSONMappingInfo{
 										Key: "Output",
 										// Name of test file producing the finding
 										ValueTransformerRegex: `\s*(\w+_test.go):`,
 									},
 								},
 							},
-							StartLine: ci.JsonMappingInfo{
+							StartLine: ci.JSONMappingInfo{
 								Key:                   "Output",
 								ValueTransformerRegex: `\s*\w_test.go:(\d+):`,
 							},
-							Message: ci.JsonMappingInfo{
+							Message: ci.JSONMappingInfo{
 								Key:                   "Output",
 								GlobalSelectorRegex:   `\s*(\w_test.go:\d+):`,
 								ValueTransformerRegex: `\s*\w_test.go:\d+:\s*(.*)`,
@@ -352,7 +352,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			}
 		}
 
-		return goRc, goErr
+		return goRc, fmt.Errorf(CommandGoTest+": %w", goErr)
 
 	case CommandGoCover:
 		slog.Info("running " + CommandGoCover)
@@ -377,29 +377,29 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						"./...",
 					},
 					FailOnAtLeastOneFinding: true,
-					JsonInfo: ci.JsonInfos{
+					JSONInfo: ci.JSONInfos{
 						Type: "stream",
-						Mappings: ci.JsonToFindingsMappings{
-							ToolName: ci.JsonMappingInfo{
+						Mappings: ci.JSONToFindingsMappings{
+							ToolName: ci.JSONMappingInfo{
 								OverrideValue: "go-cover",
 							},
-							RuleID: ci.JsonMappingInfo{
+							RuleID: ci.JSONMappingInfo{
 								OverrideValue: "no-cover-below-70",
 							},
-							Level: ci.JsonMappingInfo{
+							Level: ci.JSONMappingInfo{
 								OverrideValue: "error",
 							},
-							FilePath: ci.JsonMappingInfo{
+							FilePath: ci.JSONMappingInfo{
 								Key: "Package",
 								// Get path relative to git repo base path
 								ValueTransformerRegex: gitRepoBasePath + "/(.*)",
 							},
-							Message: ci.JsonMappingInfo{
+							Message: ci.JSONMappingInfo{
 								Key: "Output",
 								// Failed test or coverage lesser than 70%
 								GlobalSelectorRegex:   `coverage:\s*([0-6](\d)?(\.\d)?)\% of statements`,
 								ValueTransformerRegex: `coverage:\s*([0-6](\d)?(\.\d)?\%) of statements`,
-								Suffix: &ci.JsonMappingInfo{
+								Suffix: &ci.JSONMappingInfo{
 									OverrideValue: " package coverage is below 70%",
 								},
 							},
@@ -421,7 +421,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 	case CommandGoBuild:
 		slog.Info("running " + CommandGoBuild)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "goreleaser",
@@ -432,12 +432,12 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--clean",
 					"--snapshot",
 				},
-				JsonInfo: ci.JsonInfos{
+				JSONInfo: ci.JSONInfos{
 					Type: "none",
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandGoBuild+": %w", err)
 
 	case CommandGoModTidy:
 		slog.Info("running " + CommandGoModTidy)
@@ -454,19 +454,19 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						"tidy",
 						"-diff",
 					},
-					JsonInfo: ci.JsonInfos{
+					JSONInfo: ci.JSONInfos{
 						Type: "plain",
-						Mappings: ci.JsonToFindingsMappings{
-							ToolName: ci.JsonMappingInfo{
+						Mappings: ci.JSONToFindingsMappings{
+							ToolName: ci.JSONMappingInfo{
 								OverrideValue: "go-mod-tidy",
 							},
-							RuleID: ci.JsonMappingInfo{
+							RuleID: ci.JSONMappingInfo{
 								OverrideValue: "no-unused-dependency",
 							},
-							Level: ci.JsonMappingInfo{
+							Level: ci.JSONMappingInfo{
 								OverrideValue: "error",
 							},
-							FilePath: ci.JsonMappingInfo{
+							FilePath: ci.JSONMappingInfo{
 								OverrideValue: strings.TrimPrefix(
 									strings.Join(
 										strings.Split(mod, filesfind.FilesFindingRootPath)[1:],
@@ -475,7 +475,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 									"/",
 								),
 							},
-							Message: ci.JsonMappingInfo{
+							Message: ci.JSONMappingInfo{
 								OverrideValue: "Unused dependencies found in " + mod,
 							},
 						},
@@ -491,7 +491,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			}
 		}
 
-		return goRc, goErr
+		return goRc, fmt.Errorf(CommandGoModTidy+": %w", goErr)
 
 	case CommandGoModName:
 		slog.Info("running " + CommandGoModName)
@@ -509,19 +509,19 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						"edit",
 						"-json",
 					},
-					JsonInfo: ci.JsonInfos{
+					JSONInfo: ci.JSONInfos{
 						Type: "object",
-						Mappings: ci.JsonToFindingsMappings{
-							ToolName: ci.JsonMappingInfo{
+						Mappings: ci.JSONToFindingsMappings{
+							ToolName: ci.JSONMappingInfo{
 								OverrideValue: "go-mod-name",
 							},
-							RuleID: ci.JsonMappingInfo{
+							RuleID: ci.JSONMappingInfo{
 								OverrideValue: "mod-name-must-match-repo-structure",
 							},
-							Level: ci.JsonMappingInfo{
+							Level: ci.JSONMappingInfo{
 								OverrideValue: "error",
 							},
-							FilePath: ci.JsonMappingInfo{
+							FilePath: ci.JSONMappingInfo{
 								OverrideValue: strings.TrimPrefix(
 									strings.Join(
 										strings.Split(mod, filesfind.FilesFindingRootPath)[1:],
@@ -530,7 +530,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 									"/",
 								),
 							},
-							Message: ci.JsonMappingInfo{
+							Message: ci.JSONMappingInfo{
 								Key: "Module.Path",
 								GlobalSelectorRegex: strings.ReplaceAll(
 									expectedGoModName,
@@ -538,9 +538,9 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 									`\.`,
 								) + "$",
 								InvertGlobalSelector: true,
-								Suffix: &ci.JsonMappingInfo{
+								Suffix: &ci.JSONMappingInfo{
 									OverrideValue: " does not match the repository structure, module name should be ",
-									Suffix: &ci.JsonMappingInfo{
+									Suffix: &ci.JSONMappingInfo{
 										OverrideValue: expectedGoModName,
 									},
 								},
@@ -580,55 +580,55 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			lintArgs = append(lintArgs, "--fix")
 		}
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin:     "golangci-lint",
 				CliArgs: lintArgs,
-				JsonInfo: ci.JsonInfos{
-					Mappings: ci.JsonToFindingsMappings{
+				JSONInfo: ci.JSONInfos{
+					Mappings: ci.JSONToFindingsMappings{
 						BaseArrayKey: "Issues",
-						ToolName: ci.JsonMappingInfo{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "golangci-lint",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "FromLinter",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							Key: "Severity",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "Pos.Filename",
 						},
-						StartLine: ci.JsonMappingInfo{
+						StartLine: ci.JSONMappingInfo{
 							Key: "Pos.Line",
 						},
-						StartCol: ci.JsonMappingInfo{
+						StartCol: ci.JSONMappingInfo{
 							Key: "Pos.Column",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "Text",
 						},
 					},
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandGoLint+": %w", err)
 
 	case CommandDeps:
-		f, err := os.CreateTemp("/tmp", "sbom-*.json")
+		sbomFile, err := os.CreateTemp("/tmp", "sbom-*.json")
 		if err != nil {
 			return 1, fmt.Errorf("error creating temp file: %w", err)
 		}
 
-		defer os.Remove(f.Name())
+		defer os.Remove(sbomFile.Name())
 		slog.Info(
 			"running "+CommandDeps,
 			slog.String("step", "syft"),
-			slog.String("outputFile", f.Name()),
+			slog.String("outputFile", sbomFile.Name()),
 		)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "syft",
@@ -639,21 +639,21 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--source-name",
 					gitRepoBasePath,
 					"--output",
-					"spdx-json=" + f.Name(),
+					"spdx-json=" + sbomFile.Name(),
 					".",
 				},
 			})
-		if err != nil || rc != 0 {
-			return rc, err
+		if err != nil || retCode != 0 {
+			return retCode, fmt.Errorf(CommandDeps+": %w", err)
 		}
 
 		slog.Info(
 			"running "+CommandDeps,
 			slog.String("step", "grype"),
-			slog.String("outputFile", f.Name()),
+			slog.String("outputFile", sbomFile.Name()),
 		)
 
-		rc, _, _, err = lint.RunLinter(
+		retCode, _, _, err = lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "grype",
@@ -662,41 +662,41 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"config/grype/.grype.yaml",
 					"--output",
 					"json",
-					f.Name(),
+					sbomFile.Name(),
 				},
-				JsonInfo: ci.JsonInfos{
-					Mappings: ci.JsonToFindingsMappings{
+				JSONInfo: ci.JSONInfos{
+					Mappings: ci.JSONToFindingsMappings{
 						BaseArrayKey: "matches",
-						ToolName: ci.JsonMappingInfo{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "grype",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "vulnerability.id",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							Key:          "vulnerability.severity",
 							DefaultValue: "error",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "artifact.name",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "vulnerability.description",
-							Suffix: &ci.JsonMappingInfo{
+							Suffix: &ci.JSONMappingInfo{
 								OverrideValue: " - ",
-								Suffix: &ci.JsonMappingInfo{
+								Suffix: &ci.JSONMappingInfo{
 									Key: "vulnerability.dataSource",
-									Suffix: &ci.JsonMappingInfo{
+									Suffix: &ci.JSONMappingInfo{
 										OverrideValue: " - Found version: ",
-										Suffix: &ci.JsonMappingInfo{
+										Suffix: &ci.JSONMappingInfo{
 											Key: "artifact.version",
-											Suffix: &ci.JsonMappingInfo{
+											Suffix: &ci.JSONMappingInfo{
 												OverrideValue: " - Constraint: ",
-												Suffix: &ci.JsonMappingInfo{
+												Suffix: &ci.JSONMappingInfo{
 													Key: "matchDetails.found.versionConstraint",
-													Suffix: &ci.JsonMappingInfo{
+													Suffix: &ci.JSONMappingInfo{
 														OverrideValue: " - Suggested version: ",
-														Suffix: &ci.JsonMappingInfo{
+														Suffix: &ci.JSONMappingInfo{
 															Key: "matchDetails.fix.suggestedVersion",
 														},
 													},
@@ -711,12 +711,12 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandDeps+": %w", err)
 
 	case CommandMarkdown:
 		slog.Info("running " + CommandMarkdown)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "markdownlint",
@@ -729,33 +729,33 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				Paths: []string{
 					filesfind.FilesFindingRootPath,
 				},
-				JsonInfo: ci.JsonInfos{
+				JSONInfo: ci.JSONInfos{
 					ReadFromStderr: true,
-					Mappings: ci.JsonToFindingsMappings{
-						ToolName: ci.JsonMappingInfo{
+					Mappings: ci.JSONToFindingsMappings{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "markdownlint",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "ruleNames",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							OverrideValue: "error",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "fileName",
 						},
-						StartLine: ci.JsonMappingInfo{
+						StartLine: ci.JSONMappingInfo{
 							Key: "lineNumber",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "ruleDescription",
-							Suffix: &ci.JsonMappingInfo{
+							Suffix: &ci.JSONMappingInfo{
 								OverrideValue: " - ",
-								Suffix: &ci.JsonMappingInfo{
+								Suffix: &ci.JSONMappingInfo{
 									Key: "errorDetail",
-									Suffix: &ci.JsonMappingInfo{
+									Suffix: &ci.JSONMappingInfo{
 										OverrideValue: " - ",
-										Suffix: &ci.JsonMappingInfo{
+										Suffix: &ci.JSONMappingInfo{
 											Key: "ruleInformation",
 										},
 									},
@@ -766,12 +766,12 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandMarkdown+": %w", err)
 
 	case CommandShell:
 		slog.Info("running " + CommandShell)
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "shellcheck",
@@ -783,40 +783,40 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 				Paths: []string{
 					filesfind.FilesFindingRootPath,
 				},
-				JsonInfo: ci.JsonInfos{
-					Mappings: ci.JsonToFindingsMappings{
-						ToolName: ci.JsonMappingInfo{
+				JSONInfo: ci.JSONInfos{
+					Mappings: ci.JSONToFindingsMappings{
+						ToolName: ci.JSONMappingInfo{
 							OverrideValue: "shellcheck",
 						},
-						RuleID: ci.JsonMappingInfo{
+						RuleID: ci.JSONMappingInfo{
 							Key: "code",
 						},
-						Level: ci.JsonMappingInfo{
+						Level: ci.JSONMappingInfo{
 							Key: "level",
 						},
-						FilePath: ci.JsonMappingInfo{
+						FilePath: ci.JSONMappingInfo{
 							Key: "file",
 						},
-						StartLine: ci.JsonMappingInfo{
+						StartLine: ci.JSONMappingInfo{
 							Key: "line",
 						},
-						EndLine: ci.JsonMappingInfo{
+						EndLine: ci.JSONMappingInfo{
 							Key: "endLine",
 						},
-						StartCol: ci.JsonMappingInfo{
+						StartCol: ci.JSONMappingInfo{
 							Key: "column",
 						},
-						EndCol: ci.JsonMappingInfo{
+						EndCol: ci.JSONMappingInfo{
 							Key: "endColumn",
 						},
-						Message: ci.JsonMappingInfo{
+						Message: ci.JSONMappingInfo{
 							Key: "message",
 						},
 					},
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandShell+": %w", err)
 
 	case CommandRelease:
 		slog.Info("running " + CommandRelease)
@@ -835,7 +835,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 
 		slog.Info("running "+CommandRelease, slog.String("step", "goreleaser"))
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin: "goreleaser",
@@ -846,20 +846,20 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					"--clean",
 				},
 			})
-		if rc != 0 {
-			return rc, fmt.Errorf(
+		if retCode != 0 {
+			return retCode, fmt.Errorf(
 				"error running goreleaser: exit code %d: %w",
-				rc,
+				retCode,
 				ErrExitCodeNotZero,
 			)
 		}
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandRelease+": %w", err)
 
 	case CommandPRTitleCheck:
 		slog.Info("running " + CommandPRTitleCheck)
 
-		finding, err := pr.CheckPRTitle(os.Args)
+		finding, err := pr.CheckPRTitle(os.Args[2])
 		if err != nil {
 			return 1, fmt.Errorf("error checking PR title: %w", err)
 		}
@@ -951,7 +951,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 		failedCommands := make([]string, 0)
 
 		for _, cmd := range commands {
-			slog.Info("running command: " + cmd)
+			slog.Info("running command", slog.String("command", cmd))
 
 			go func(command string) {
 				defer waitGroup.Done()
@@ -961,7 +961,7 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 					cmdArgs = append(cmdArgs, "--fix")
 				}
 
-				rc, err := DispatchCommand(config, cmdArgs)
+				retCode, err := Run(config, cmdArgs)
 				if err != nil {
 					slog.Error(
 						"Error executing command",
@@ -969,14 +969,14 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 						slog.String("error", err.Error()),
 					)
 
-					goRc += rc
+					goRc += retCode
 				}
 
-				if rc != 0 {
+				if retCode != 0 {
 					slog.Error(
 						"Command failed",
 						slog.String("command", command),
-						slog.Int("returnCode", rc),
+						slog.Int("returnCode", retCode),
 					)
 
 					failedCommands = append(failedCommands, command)
@@ -1007,17 +1007,17 @@ func DispatchCommand(config *config.Config, args []string) (int, error) {
 			os.Setenv("LOG_LEVEL", "debug")
 		}
 
-		rc, _, _, err := lint.RunLinter(
+		retCode, _, _, err := lint.RunLinter(
 			config,
 			lint.LinterArgs{
 				Bin:     "renovate",
 				CliArgs: []string{},
-				JsonInfo: ci.JsonInfos{
+				JSONInfo: ci.JSONInfos{
 					Type: "none",
 				},
 			})
 
-		return rc, err
+		return retCode, fmt.Errorf(CommandDepsBump+": %w", err)
 
 	case "help":
 		slog.Info("Available commands:")

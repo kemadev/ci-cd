@@ -32,9 +32,9 @@ func NewConfig() (*Config, error) {
 		devNull, err := os.Open(os.DevNull)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open "+os.DevNull+": %w", err)
-		} else {
-			slogFd = devNull
 		}
+
+		slogFd = devNull
 	} else {
 		slogFd = os.Stdout
 	}

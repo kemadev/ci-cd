@@ -24,7 +24,7 @@ type LinterArgs struct {
 	Paths    []string
 	CliArgs  []string
 	Workdir  string
-	JsonInfo ci.JsonInfos
+	JSONInfo ci.JSONInfos
 	// Return non-zero exit code if at least one finding is found
 	FailOnAtLeastOneFinding bool
 }
@@ -196,39 +196,39 @@ func handleLinterOutcome(
 
 	retCode := cmd.ProcessState.ExitCode()
 
-	switch args.JsonInfo.Type {
+	switch args.JSONInfo.Type {
 	case "none":
 		slog.Debug(
 			"No finding parsing requested, skipping",
-			slog.String("type", args.JsonInfo.Type),
+			slog.String("type", args.JSONInfo.Type),
 		)
 	case "plain":
 		if len(stdoutBuf.String()) == 0 {
 			return 0, nil
 		}
 
-		f := ci.Finding{
-			ToolName:  args.JsonInfo.Mappings.ToolName.OverrideValue,
-			RuleID:    args.JsonInfo.Mappings.RuleID.OverrideValue,
-			Level:     args.JsonInfo.Mappings.Level.OverrideValue,
-			FilePath:  args.JsonInfo.Mappings.FilePath.OverrideValue,
-			Message:   args.JsonInfo.Mappings.Message.OverrideValue,
+		find := ci.Finding{
+			ToolName:  args.JSONInfo.Mappings.ToolName.OverrideValue,
+			RuleID:    args.JSONInfo.Mappings.RuleID.OverrideValue,
+			Level:     args.JSONInfo.Mappings.Level.OverrideValue,
+			FilePath:  args.JSONInfo.Mappings.FilePath.OverrideValue,
+			Message:   args.JSONInfo.Mappings.Message.OverrideValue,
 			StartLine: 0,
 			EndLine:   0,
 			StartCol:  0,
 			EndCol:    0,
 		}
-		findings = append(findings, f)
+		findings = append(findings, find)
 	default:
 		var str string
 
-		if args.JsonInfo.ReadFromStderr {
+		if args.JSONInfo.ReadFromStderr {
 			str = stderrBuf.String()
 		} else {
 			str = stdoutBuf.String()
 		}
 
-		fa, err := ci.FindingsFromJSON(str, args.JsonInfo)
+		fa, err := ci.FindingsFromJSON(str, args.JSONInfo)
 		if err != nil {
 			return 1, fmt.Errorf("error parsing findings: %w", err)
 		}

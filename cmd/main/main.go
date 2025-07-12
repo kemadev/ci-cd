@@ -23,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	retCode, err := dispatch.DispatchCommand(config, os.Args[1:])
+	retCode, err := dispatch.Run(config, os.Args[1:])
 	if err != nil {
 		slog.Error("Error executing command", slog.String("error", err.Error()))
 

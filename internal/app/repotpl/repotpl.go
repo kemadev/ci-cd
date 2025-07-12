@@ -27,9 +27,9 @@ var (
 	)
 )
 
-var (
-	DayBeforeStale                = 30
+const (
 	RepoTemplateUpdateTrackerFile = "config/copier/.copier-answers.yml"
+	DayBeforeStale                = 30
 )
 
 func CheckRepoTemplateUpdate() (ci.Finding, error) {
@@ -68,10 +68,13 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 			break
 		}
 
+		// v1.2.3 format
+		expectedPartsNumber := 3
+
 		tagName := tplTag.Name().Short()
 		if semverRegex.MatchString(tagName) {
 			tagParts := strings.Split(tagName, ".")
-			if len(tagParts) != 3 {
+			if len(tagParts) != expectedPartsNumber {
 				return ci.Finding{}, fmt.Errorf(
 					"tag %s: expected format vX.Y.Z: %w",
 					tagName,
@@ -80,7 +83,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 			}
 
 			lastTagParts := strings.Split(tplLastTag, ".")
-			if tplLastTag != "" && len(lastTagParts) != 3 {
+			if tplLastTag != "" && len(lastTagParts) != expectedPartsNumber {
 				return ci.Finding{}, fmt.Errorf(
 					"tag %s: expected format vX.Y.Z: %w",
 					tagName,
@@ -168,8 +171,11 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 
 	re := regexp.MustCompile(`(?m)^_commit:\s*(.+)$`)
 
+	// The match and exactly one submatch
+	expectedMatchesNum := 2
 	matches := re.FindStringSubmatch(copierConfContent)
-	if len(matches) != 2 {
+
+	if len(matches) != expectedMatchesNum {
 		return ci.Finding{}, fmt.Errorf(
 			"error parsing repository template update tracker file: %w",
 			ErrRepoTemplateUpdateTrackerFileNoCommit,
@@ -185,6 +191,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	}
 
 	if lastCommitHash != tplLastTag {
+		//nolint:exhaustruct // Position is ok being empty
 		return ci.Finding{
 			ToolName: "repo-template-updater",
 			FilePath: RepoTemplateUpdateTrackerFile,
@@ -198,5 +205,6 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		}, nil
 	}
 
+	//nolint:exhaustruct // Returning empty finding is ok
 	return ci.Finding{}, nil
 }

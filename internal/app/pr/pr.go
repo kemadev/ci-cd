@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"regexp"
-	"strings"
 
 	"github.com/kemadev/ci-cd/pkg/ci"
 )
@@ -17,12 +16,7 @@ var (
 	ErrPRTitleNil     = fmt.Errorf("PR title is nil")
 )
 
-func CheckPRTitle(args []string) (ci.Finding, error) {
-	if len(args) < 3 {
-		return ci.Finding{}, ErrPRTitleNil
-	}
-
-	prTitle := strings.Join(args[2:], " ")
+func CheckPRTitle(title string) (ci.Finding, error) {
 	// Highly inspired by https://gist.github.com/marcojahn/482410b728c31b221b70ea6d2c433f0c
 	// Reference: https://www.conventionalcommits.org
 	prTitleRegex := `^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\([[:alnum:]._-]+\))?(!)?: ([[:alnum:]])+([[:space:][:print:]])*$`
@@ -32,7 +26,8 @@ func CheckPRTitle(args []string) (ci.Finding, error) {
 		return ci.Finding{}, fmt.Errorf("failed to compile regex: %w", err)
 	}
 
-	if !exp.MatchString(prTitle) {
+	if !exp.MatchString(title) {
+		//nolint:exhaustruct // Position is ok being empty
 		return ci.Finding{
 			ToolName: "pr-title-checker",
 			Level:    "error",
@@ -42,7 +37,8 @@ func CheckPRTitle(args []string) (ci.Finding, error) {
 		}, nil
 	}
 
-	slog.Info("PR title is valid", "title", prTitle)
+	slog.Info("PR title is valid", slog.String("title", title))
 
+	//nolint:exhaustruct // Returning empty finding is ok
 	return ci.Finding{}, nil
 }

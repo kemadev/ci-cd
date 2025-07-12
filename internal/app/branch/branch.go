@@ -23,7 +23,7 @@ var (
 )
 
 // StaleBranchThreshold is the threshold for a branch to be considered stale.
-var DayBeforeStale = 0
+const DayBeforeStale = 0
 
 type StaleBranch struct {
 	Name             string
@@ -62,7 +62,7 @@ func CheckStaleBranches() (ci.Finding, error) {
 	var staleBranches []StaleBranch
 
 	err = branches.ForEach(func(branch *plumbing.Reference) error {
-		slog.Debug("checking branch", "branch", branch.Name().Short())
+		slog.Debug("checking branch", slog.String("branch", branch.Name().Short()))
 		// Branch which the workflow is running on is not considered stale
 		if branch.Name() == currentBranch.Name() {
 			return nil
@@ -120,18 +120,19 @@ func CheckStaleBranches() (ci.Finding, error) {
 			return ci.Finding{}, ErrRemoteOriginNil
 		}
 
-		repoUrlString := remote.Config().URLs[0]
+		repoURLString := remote.Config().URLs[0]
 
-		repoUrl, err := url.Parse(repoUrlString)
+		repoURL, err := url.Parse(repoURLString)
 		if err != nil {
 			return ci.Finding{}, fmt.Errorf("error parsing remote URL: %w", err)
 		}
 
 		message += fmt.Sprintf(
 			". Please delete these stale branches. You can view recently deleted branches (and optionally restore them) by navigating to [reposiitory activity](%s)",
-			repoUrl.String()+"/activity?activity_type=branch_deletion",
+			repoURL.String()+"/activity?activity_type=branch_deletion",
 		)
 
+		//nolint:exhaustruct // Position is ok being empty
 		return ci.Finding{
 			ToolName: "stale-branch-checker",
 			Level:    "error",
@@ -141,5 +142,6 @@ func CheckStaleBranches() (ci.Finding, error) {
 		}, nil
 	}
 
+	//nolint:exhaustruct // Returning empty finding is ok
 	return ci.Finding{}, nil
 }

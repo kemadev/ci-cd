@@ -12,13 +12,13 @@ import (
 )
 
 var FilesFindingRootPath = func() string {
-	wd, err := os.Getwd()
+	workDir, err := os.Getwd()
 	if err != nil {
 		slog.Error("error getting current working directory", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 
-	return wd
+	return workDir
 }()
 
 var ErrNoExtension = fmt.Errorf("file extension is required")

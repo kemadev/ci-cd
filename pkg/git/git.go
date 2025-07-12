@@ -100,6 +100,7 @@ func PushTag() error {
 		return fmt.Errorf("error getting git repository: %w", err)
 	}
 
+	//nolint:exhaustruct // Unused config is ok being empty
 	err = repo.Push(&git.PushOptions{
 		RemoteName: "origin",
 		FollowTags: true,
@@ -118,6 +119,7 @@ func PushTag() error {
 }
 
 func GetRemoteGitRepo(remoteURL string) (*git.Repository, error) {
+	//nolint:exhaustruct // Unused config is ok being empty
 	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
 		URL: remoteURL,
 	})
