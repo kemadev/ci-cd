@@ -71,7 +71,8 @@ func startCmd(
 	lintArgs LinterArgs,
 	args []string,
 ) (*sync.WaitGroup, *exec.Cmd, *bytes.Buffer, *bytes.Buffer, error) {
-	//nolint:gosec // we purposefully pass user controlled arguments, this script does not run outside of CI
+	//nolint:gosec // We purposefully pass user controlled arguments, this script does not run outside of CI
+	// nosemgrep // Same
 	cmd := exec.Command(lintArgs.Bin, args...)
 
 	stdoutPipe, err := cmd.StdoutPipe()

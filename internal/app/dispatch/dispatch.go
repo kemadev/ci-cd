@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package dispatch
 
 import (
@@ -953,6 +956,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		waitGroup.Add(len(commands))
 
 		failedCommands := make([]string, 0)
+		var failedCommandsMu sync.Mutex
 
 		for _, cmd := range commands {
 			slog.Info("running command", slog.String("command", cmd))
@@ -983,7 +987,9 @@ func Run(config *config.Config, args []string) (int, error) {
 						slog.Int("returnCode", retCode),
 					)
 
+					failedCommandsMu.Lock()
 					failedCommands = append(failedCommands, command)
+					failedCommandsMu.Unlock()
 				} else {
 					slog.Debug("Command succeeded", slog.String("command", command))
 				}
