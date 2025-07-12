@@ -26,7 +26,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd:latest
+      image: ghcr.io/kemadev/ci-cd:latest@sha256:6ce495f91dbaa89fd7915b18a76c4d095002dbce3ff2773f6897d5695ecc0de8
       env:
         # Make race detection possible
         CGO_ENABLED: 1
@@ -36,7 +36,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Go unit test
         id: go-unit-test
         run: kema-runner go-test
@@ -47,14 +47,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd:latest
+      image: ghcr.io/kemadev/ci-cd:latest@sha256:6ce495f91dbaa89fd7915b18a76c4d095002dbce3ff2773f6897d5695ecc0de8
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Go test coverage
         id: go-test-coverage
         run: kema-runner go-cover
@@ -65,14 +65,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd:latest
+      image: ghcr.io/kemadev/ci-cd:latest@sha256:6ce495f91dbaa89fd7915b18a76c4d095002dbce3ff2773f6897d5695ecc0de8
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set git safe directory
         run: git config --global --add safe.directory "${GITHUB_WORKSPACE//\/home\/runner\/work\//\/__w\/}"
       - name: Login to GitHub Packages
@@ -105,14 +105,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd:latest
+      image: ghcr.io/kemadev/ci-cd:latest@sha256:6ce495f91dbaa89fd7915b18a76c4d095002dbce3ff2773f6897d5695ecc0de8
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Go go.mod tidyness
         id: go-check-mod-tidy
         run: kema-runner go-mod-tidy
@@ -123,14 +123,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd:latest
+      image: ghcr.io/kemadev/ci-cd:latest@sha256:6ce495f91dbaa89fd7915b18a76c4d095002dbce3ff2773f6897d5695ecc0de8
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Go go.mod name
         id: go-check-mod-name
         run: kema-runner go-mod-name
@@ -141,14 +141,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd:latest
+      image: ghcr.io/kemadev/ci-cd:latest@sha256:6ce495f91dbaa89fd7915b18a76c4d095002dbce3ff2773f6897d5695ecc0de8
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set git safe directory
         run: git config --global --add safe.directory "${GITHUB_WORKSPACE//\/home\/runner\/work\//\/__w\/}"
       - name: Go lint
