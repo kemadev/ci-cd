@@ -5,21 +5,10 @@ package filesfind
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"slices"
 	"strings"
 )
-
-var FilesFindingRootPath = func() string {
-	workDir, err := os.Getwd()
-	if err != nil {
-		slog.Error("error getting current working directory", slog.String("error", err.Error()))
-		os.Exit(1)
-	}
-
-	return workDir
-}()
 
 var ErrNoExtension = fmt.Errorf("file extension is required")
 
@@ -30,9 +19,23 @@ type FilesFindingArgs struct {
 	Recursive   bool
 }
 
+func GetFilesFindingRootPath() (string, error) {
+	workDir, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("error getting current working directory: %w", err)
+	}
+
+	return workDir, nil
+}
+
 func handleArgs(args FilesFindingArgs) (FilesFindingArgs, error) {
+	rootPath, err := GetFilesFindingRootPath()
+	if err != nil {
+		return FilesFindingArgs{}, fmt.Errorf("error getting root path: %w", err)
+	}
+
 	if args.Paths == nil {
-		args.Paths = []string{FilesFindingRootPath}
+		args.Paths = []string{rootPath}
 	}
 
 	if args.Extension == "" {

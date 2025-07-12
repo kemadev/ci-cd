@@ -70,6 +70,11 @@ func Run(config *config.Config, args []string) (int, error) {
 
 	slog.Debug("Go mod list", slog.Any("goModList", goModList))
 
+	filesFindRootPath, err := filesfind.GetFilesFindingRootPath()
+	if err != nil {
+		return 1, fmt.Errorf("error getting files finding root path: %w", err)
+	}
+
 	goRc := 0
 	goErr := error(nil)
 
@@ -83,7 +88,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				Bin: "hadolint",
 				Ext: "Dockerfile",
 				Paths: []string{
-					filesfind.FilesFindingRootPath,
+					filesFindRootPath,
 				},
 				CliArgs: []string{
 					"--format",
@@ -124,8 +129,8 @@ func Run(config *config.Config, args []string) (int, error) {
 				Bin: "actionlint",
 				Ext: ".yaml",
 				Paths: []string{
-					filesfind.FilesFindingRootPath + "/.github/workflows",
-					filesfind.FilesFindingRootPath + "/.github/actions",
+					filesFindRootPath + "/.github/workflows",
+					filesFindRootPath + "/.github/actions",
 				},
 				CliArgs: []string{
 					"-format",
@@ -284,7 +289,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandGoTest)
 
 		for _, mod := range goModList {
-			if strings.HasPrefix(mod, filesfind.FilesFindingRootPath+"/deploy/") {
+			if strings.HasPrefix(mod, filesFindRootPath+"/deploy/") {
 				slog.Info("skipping "+CommandGoTest, slog.String("mod", mod))
 
 				continue
@@ -358,7 +363,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandGoCover)
 
 		for _, mod := range goModList {
-			if strings.HasPrefix(mod, filesfind.FilesFindingRootPath+"/deploy/") {
+			if strings.HasPrefix(mod, filesFindRootPath+"/deploy/") {
 				slog.Info("skipping "+CommandGoCover, slog.String("mod", mod))
 
 				continue
@@ -469,7 +474,7 @@ func Run(config *config.Config, args []string) (int, error) {
 							FilePath: ci.JSONMappingInfo{
 								OverrideValue: strings.TrimPrefix(
 									strings.Join(
-										strings.Split(mod, filesfind.FilesFindingRootPath)[1:],
+										strings.Split(mod, filesFindRootPath)[1:],
 										"",
 									),
 									"/",
@@ -498,7 +503,7 @@ func Run(config *config.Config, args []string) (int, error) {
 
 		for _, mod := range goModList {
 			slog.Info("running "+CommandGoModName, slog.String("mod", mod))
-			expectedGoModName := gitRepoBasePath + strings.Split(strings.Join(strings.Split(mod, filesfind.FilesFindingRootPath)[1:], ""), "/go.mod")[0]
+			expectedGoModName := gitRepoBasePath + strings.Split(strings.Join(strings.Split(mod, filesFindRootPath)[1:], ""), "/go.mod")[0]
 			retCode, _, _, err := lint.RunLinter(
 				config,
 				lint.LinterArgs{
@@ -524,7 +529,7 @@ func Run(config *config.Config, args []string) (int, error) {
 							FilePath: ci.JSONMappingInfo{
 								OverrideValue: strings.TrimPrefix(
 									strings.Join(
-										strings.Split(mod, filesfind.FilesFindingRootPath)[1:],
+										strings.Split(mod, filesFindRootPath)[1:],
 										"",
 									),
 									"/",
@@ -727,7 +732,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				},
 				Ext: ".md",
 				Paths: []string{
-					filesfind.FilesFindingRootPath,
+					filesFindRootPath,
 				},
 				JSONInfo: ci.JSONInfos{
 					ReadFromStderr: true,
@@ -781,7 +786,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				},
 				Ext: ".sh",
 				Paths: []string{
-					filesfind.FilesFindingRootPath,
+					filesFindRootPath,
 				},
 				JSONInfo: ci.JSONInfos{
 					Mappings: ci.JSONToFindingsMappings{
