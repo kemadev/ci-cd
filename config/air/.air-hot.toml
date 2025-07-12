@@ -1,5 +1,5 @@
 [build]
-cmd = "echo oui"
+cmd = "true"
 bin = "/usr/local/bin/kema-runner"
 # Use arguments passed at runtime to the binary
 args_bin = ["${@}"]
