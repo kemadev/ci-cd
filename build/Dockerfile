@@ -177,10 +177,26 @@ LABEL org.opencontainers.image.source="https://github.com/kemadev/ci-cd"
 LABEL org.opencontainers.image.vendor="kemadev"
 LABEL org.opencontainers.image.licenses="MPL-2.0"
 
+RUN go install github.com/air-verse/air@latest
+
 COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
 COPY config/air/.air-hot.toml /var/config/air/.air-hot.toml
 
+ENTRYPOINT ["air", "-c", "/var/config/air/.air-hot.toml"]
+
+FROM clean-deps AS goreleaser-hot
+
+LABEL org.opencontainers.image.authors="kemadev"
+LABEL org.opencontainers.image.url="ghcr.io/kemadev/ci-cd"
+LABEL org.opencontainers.image.documentation="https://github.com/kemadev/ci-cd"
+LABEL org.opencontainers.image.source="https://github.com/kemadev/ci-cd"
+LABEL org.opencontainers.image.vendor="kemadev"
+LABEL org.opencontainers.image.licenses="MPL-2.0"
+
 RUN go install github.com/air-verse/air@latest
+
+COPY ci-cd /usr/local/bin/kema-runner
+COPY config/air/.air-hot.toml /var/config/air/.air-hot.toml
 
 ENTRYPOINT ["air", "-c", "/var/config/air/.air-hot.toml"]
 
