@@ -89,6 +89,8 @@ dockers:
     ids:
       - default
     dockerfile: build/Dockerfile
+    extra_files:
+      - go.mod
     build_flag_templates:
       - '--pull'
       - '--secret=id=gitcreds,src=/tmp/gitcreds'
@@ -106,6 +108,8 @@ dockers:
     ids:
       - default
     dockerfile: build/Dockerfile
+    extra_files:
+      - go.mod
     build_flag_templates:
       - '--pull'
       - '--secret=id=gitcreds,src=/tmp/gitcreds'

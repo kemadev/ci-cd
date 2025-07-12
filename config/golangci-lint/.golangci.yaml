@@ -37,7 +37,7 @@ linters:
     # Checks exhaustiveness of enum switch statements.
     - exhaustive
     # Checks if all structure fields are initialized.
-    - exhaustruct
+    # - exhaustruct
     # Detects functions from golang.org/x/exp/ that can be replaced by std functions.
     - exptostd
     # Detects nested contexts in loops and function literals.

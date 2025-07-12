@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD041 -->
 <div align=center>
   <a href="https://github.com/kemadev/ci-cd/actions/workflows/go-cd.yaml"><img alt="Go - CD - main" src="https://github.com/kemadev/ci-cd/actions/workflows/go-cd.yaml/badge.svg?branch=main&event=push"></a>
   <a href="https://github.com/kemadev/ci-cd/actions/workflows/go-cd.yaml"><img alt="Go - CD - next" src="https://github.com/kemadev/ci-cd/actions/workflows/go-cd.yaml/badge.svg?branch=next&event=push"></a>
@@ -109,4 +110,5 @@
   - `shellcheck`: Add a `shellcheck disable=<rule>` comment. See [this doc](https://github.com/koalaman/shellcheck/wiki/Ignore)
   - `hadolint`: Add a `hadolint ignore=<rule>` comment. See [this doc](https://github.com/hadolint/hadolint/blob/master/README.md#ignoring-rules)
   - `actionlint`: In case of a `shellcheck` error, refer to the `shellcheck` section. Otherwise, you can pass arguments to the linting action to ignore specific rules. See [this doc](https://github.com/rhysd/actionlint/blob/main/docs/usage.md#ignore-some-errors)
-  - `grype`: Add an ignore in upstream [repo-template .grype.yaml](https://github.com/kemadev/repo-template/blob/main/config/grype/.grype.yaml). See [this doc](https://github.com/anchore/grype#specifying-matches-to-ignore). Please note that **any vulnerability should be remediated as soon as possible**, only add true false positives to the ignore list. Prefer deploying with a non-exploitable vulnerability reported rather than ignoring it.
+  - `grype`: Add an ignore in upstream [repo-template .grype.yaml](https://github.com/kemadev/repo-template/blob/main/config/grype/.grype.yaml). See [this doc](https://github.com/anchore/grype#specifying-matches-to-ignore).
+    Please note that **any vulnerability should be remediated as soon as possible**, only add true false positives to the ignore list. Prefer deploying with a non-exploitable vulnerability reported rather than ignoring it.
