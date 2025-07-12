@@ -171,7 +171,7 @@ docker_manifests:
     image_templates:
       - 'ghcr.io/kemadev/{{ .ProjectName }}:v{{ .Version }}-hot-amd64'
       - 'ghcr.io/kemadev/{{ .ProjectName }}:v{{ .Version }}-hot-arm64'
-  - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:dev-latest'
+  - name_template: 'ghcr.io/kemadev/{{ .ProjectName }}:hot-latest'
     image_templates:
       - 'ghcr.io/kemadev/{{ .ProjectName }}:v{{ .Version }}-hot-amd64'
       - 'ghcr.io/kemadev/{{ .ProjectName }}:v{{ .Version }}-hot-arm64'
