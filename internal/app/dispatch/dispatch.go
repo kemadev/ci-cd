@@ -956,7 +956,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		}
 		waitGroup.Add(len(commands))
 
-		failedCommands := make([]string, 0)
+		var failedCommands []string
 		var failedCommandsMu sync.Mutex
 
 		for _, cmd := range commands {
