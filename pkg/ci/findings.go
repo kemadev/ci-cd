@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package ci
 
 import (
@@ -109,14 +112,15 @@ func FindingsFromJSON(str string, jsonInfo JsonInfos) ([]Finding, error) {
 		str = "[" + str + "]"
 	}
 
-	var jsonm interface{}
+	var jsonm any
+
 	err := json.Unmarshal([]byte(str), &jsonm)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling json: %w", err)
 	}
 
 	if jsonInfo.Mappings.BaseArrayKey != "" {
-		njsonm, ok := jsonm.(map[string]interface{})
+		njsonm, ok := jsonm.(map[string]any)
 		if !ok {
 			return nil, fmt.Errorf(
 				"json does not contain key %s: %w",
@@ -128,7 +132,7 @@ func FindingsFromJSON(str string, jsonInfo JsonInfos) ([]Finding, error) {
 		jsonm = njsonm[jsonInfo.Mappings.BaseArrayKey]
 	}
 
-	jsonArray, ok := jsonm.([]interface{})
+	jsonArray, ok := jsonm.([]any)
 	if !ok {
 		return nil, ErrJSONNotArray
 	}
@@ -136,7 +140,7 @@ func FindingsFromJSON(str string, jsonInfo JsonInfos) ([]Finding, error) {
 	var findings []Finding
 
 	for _, item := range jsonArray {
-		m, ok := item.(map[string]interface{})
+		m, ok := item.(map[string]any)
 		if !ok {
 			return nil, ErrJSONNotArray
 		}
@@ -155,14 +159,14 @@ func FindingsFromJSON(str string, jsonInfo JsonInfos) ([]Finding, error) {
 }
 
 func findingFromJSONObject(
-	jsonm map[string]interface{},
+	jsonm map[string]any,
 	mappings JsonToFindingsMappings,
 ) (bool, Finding, error) {
 	var finding Finding
 
 	mappingFields := []struct {
 		mapping JsonMappingInfo
-		field   interface{}
+		field   any
 	}{
 		{mappings.ToolName, &finding.ToolName},
 		{mappings.RuleID, &finding.RuleID},
@@ -201,7 +205,7 @@ func findingFromJSONObject(
 	return true, finding, nil
 }
 
-func applyGlobalSelector(jsonm map[string]interface{}, mapInfo JsonMappingInfo) (bool, error) {
+func applyGlobalSelector(jsonm map[string]any, mapInfo JsonMappingInfo) (bool, error) {
 	if jsonm[mapInfo.Key] == nil {
 		return false, nil
 	}
@@ -229,9 +233,9 @@ func applyGlobalSelector(jsonm map[string]interface{}, mapInfo JsonMappingInfo) 
 }
 
 func setValue(
-	jsonm map[string]interface{},
+	jsonm map[string]any,
 	mapInfo JsonMappingInfo,
-	field interface{},
+	field any,
 ) (bool, error) {
 	jsonTargetKey := jsonm
 
@@ -272,30 +276,30 @@ func setValue(
 	}
 }
 
-func handleKeyType(jsonm map[string]interface{}, key string) map[string]interface{} {
+func handleKeyType(jsonm map[string]any, key string) map[string]any {
 	switch value := jsonm[key].(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		return value
-	case []interface{}:
+	case []any:
 		if len(value) == 0 {
 			return nil
 		}
 
-		if m, ok := value[0].(map[string]interface{}); ok {
+		if m, ok := value[0].(map[string]any); ok {
 			return m
 		}
 
-		handleKeyType(value[0].(map[string]interface{}), key)
+		handleKeyType(value[0].(map[string]any), key)
 
 		return nil
 	case string:
-		return map[string]interface{}{key: value}
+		return map[string]any{key: value}
 	case int:
-		return map[string]interface{}{key: value}
+		return map[string]any{key: value}
 	case float64:
-		return map[string]interface{}{key: int(value)}
+		return map[string]any{key: int(value)}
 	case bool:
-		return map[string]interface{}{key: value}
+		return map[string]any{key: value}
 	default:
 		return nil
 	}
@@ -357,8 +361,8 @@ func applyValueTransformerRegex(val, regex string) (string, error) {
 }
 
 func setStringValue(
-	jsonTargetKey map[string]interface{},
-	jsonm map[string]interface{},
+	jsonTargetKey map[string]any,
+	jsonm map[string]any,
 	mapInfo JsonMappingInfo,
 	field *string,
 ) error {
@@ -402,11 +406,11 @@ func setStringValue(
 			} else {
 				*field = "false"
 			}
-		case []interface{}:
+		case []any:
 			// perform aggregation
 			var values []string
 
-			for _, v := range jsonTargetKey[mapInfo.Key].([]interface{}) {
+			for _, v := range jsonTargetKey[mapInfo.Key].([]any) {
 				if str, ok := v.(string); ok {
 					values = append(values, str)
 				} else {
@@ -415,8 +419,8 @@ func setStringValue(
 			}
 
 			*field = strings.Join(values, " - ")
-		case interface{}:
-			val, ok := jsonTargetKey[mapInfo.Key].(interface{})
+		case any:
+			val, ok := jsonTargetKey[mapInfo.Key].(any)
 			if !ok {
 				return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
 			}
@@ -448,7 +452,7 @@ func setStringValue(
 	return nil
 }
 
-func setIntValue(jsonm map[string]interface{}, mapInfo JsonMappingInfo, field *int) error {
+func setIntValue(jsonm map[string]any, mapInfo JsonMappingInfo, field *int) error {
 	var def int
 
 	if mapInfo.DefaultValue != "" {

@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package branch
 
 import (
@@ -12,8 +15,10 @@ import (
 )
 
 var (
-	ErrGitRepoNil  = fmt.Errorf("git repository is nil")
-	ErrBranchesNil = fmt.Errorf("branches are nil")
+	ErrGitRepoNil     = fmt.Errorf("git repository is nil")
+	ErrBranchesNil    = fmt.Errorf("branches are nil")
+	ErrCurrBrancheNil = fmt.Errorf("current branch is nil")
+	ErrCommitNil      = fmt.Errorf("commit object is nil")
 )
 
 // StaleBranchThreshold is the threshold for a branch to be considered stale.
@@ -30,6 +35,7 @@ func CheckStaleBranches() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting git repository: %w", err)
 	}
+
 	if repo == nil {
 		return ci.Finding{}, ErrGitRepoNil
 	}
@@ -38,6 +44,7 @@ func CheckStaleBranches() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting branches: %w", err)
 	}
+
 	if branches == nil {
 		return ci.Finding{}, ErrBranchesNil
 	}
@@ -46,17 +53,20 @@ func CheckStaleBranches() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting current branch: %w", err)
 	}
+
 	if currentBranch == nil {
-		return ci.Finding{}, fmt.Errorf("current branch is nil")
+		return ci.Finding{}, ErrCurrBrancheNil
 	}
 
 	var staleBranches []StaleBranch
+
 	err = branches.ForEach(func(branch *plumbing.Reference) error {
 		slog.Debug("checking branch", "branch", branch.Name().Short())
 		// Branch which the workflow is running on is not considered stale
 		if branch.Name() == currentBranch.Name() {
 			return nil
 		}
+
 		commit, err := repo.CommitObject(branch.Hash())
 		if err != nil {
 			return fmt.Errorf(
@@ -65,9 +75,11 @@ func CheckStaleBranches() (ci.Finding, error) {
 				err,
 			)
 		}
+
 		if commit == nil {
-			return fmt.Errorf("commit object for branch %s is nil", branch.Name())
+			return fmt.Errorf("branch name %s: %w", branch.Name(), ErrCommitNil)
 		}
+
 		if commit.Committer.When.Before(time.Now().AddDate(0, 0, -DayBeforeStale)) {
 			staleBranches = append(staleBranches, StaleBranch{
 				Name:             branch.Name().Short(),
@@ -75,40 +87,50 @@ func CheckStaleBranches() (ci.Finding, error) {
 				LastCommitAuthor: commit.Committer.Name,
 			})
 		}
+
 		return nil
 	})
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error iterating branches: %w", err)
 	}
+
 	if len(staleBranches) > 0 {
 		message := "The following branches are stale: "
+
 		for i, branch := range staleBranches {
 			if i > 0 {
 				message += ", "
 			}
+
 			message += fmt.Sprintf(
 				"%s (last commit by %s on %s)",
 				branch.Name,
 				branch.LastCommitAuthor,
-				branch.LastCommitDate.Format("2006-01-02"),
+				branch.LastCommitDate.Format(time.DateOnly),
 			)
 		}
+
 		remote, err := repo.Remote("origin")
 		if err != nil {
 			return ci.Finding{}, fmt.Errorf("error getting remote origin: %w", err)
 		}
+
 		if remote == nil {
 			return ci.Finding{}, fmt.Errorf("remote origin is empty")
 		}
+
 		repoUrlString := remote.Config().URLs[0]
+
 		repoUrl, err := url.Parse(repoUrlString)
 		if err != nil {
 			return ci.Finding{}, fmt.Errorf("error parsing remote URL: %w", err)
 		}
+
 		message += fmt.Sprintf(
 			". Please delete these stale branches. You can view recently deleted branches (and optionally restore them) by navigating to [reposiitory activity](%s)",
 			repoUrl.String()+"/activity?activity_type=branch_deletion",
 		)
+
 		return ci.Finding{
 			ToolName: "stale-branch-checker",
 			Level:    "error",

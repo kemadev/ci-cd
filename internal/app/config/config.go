@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package config
 
 import (
@@ -24,6 +27,7 @@ func NewConfig() (*Config, error) {
 	}
 
 	var slogFd *os.File
+
 	if silentEnabled {
 		devNull, err := os.Open(os.DevNull)
 		if err != nil {

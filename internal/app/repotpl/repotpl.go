@@ -1,6 +1,10 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package repotpl
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
@@ -34,6 +38,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error opening git repository: %w", err)
 	}
+
 	if tplRepo == nil {
 		return ci.Finding{}, fmt.Errorf("error opening git repository: %w", ErrGitRepoNil)
 	}
@@ -42,19 +47,22 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository tags: %w", err)
 	}
+
 	if tplTags == nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository tags: %w", ErrGitTagsNil)
 	}
 
 	tplLastTag := ""
 	semverRegex := regexp.MustCompile(`^v\d+\.\d+\.\d+$`)
+
 	for {
 		tplTag, err := tplTags.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		} else if err != nil {
 			return ci.Finding{}, fmt.Errorf("error iterating repository tags: %w", err)
 		}
+
 		if tplTag == nil {
 			break
 		}
@@ -68,6 +76,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 					tagName,
 				)
 			}
+
 			lastTagParts := strings.Split(tplLastTag, ".")
 			if tplLastTag != "" && len(lastTagParts) != 3 {
 				return ci.Finding{}, fmt.Errorf(
@@ -75,6 +84,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 					tagName,
 				)
 			}
+
 			if tplLastTag == "" || (tagParts[0] > lastTagParts[0] ||
 				(tagParts[0] == lastTagParts[0] && tagParts[1] > lastTagParts[1]) ||
 				(tagParts[0] == lastTagParts[0] && tagParts[1] == lastTagParts[1] && tagParts[2] > lastTagParts[2])) {
@@ -87,6 +97,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting git repository: %w", err)
 	}
+
 	if repo == nil {
 		return ci.Finding{}, ErrGitRepoNil
 	}
@@ -95,6 +106,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository head: %w", err)
 	}
+
 	if head == nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository head: %w", ErrGitHeadNil)
 	}
@@ -104,6 +116,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository commit: %w", err)
 	}
+
 	if commit == nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository commit: %w", ErrGitHeadNil)
 	}
@@ -112,6 +125,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository tree: %w", err)
 	}
+
 	if tree == nil {
 		return ci.Finding{}, fmt.Errorf(
 			"error getting repository tree: %w",
@@ -126,6 +140,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 			ErrRepoTemplateUpdateTrackerFileDoesNotExist,
 		)
 	}
+
 	if copierConfFile == nil {
 		return ci.Finding{}, fmt.Errorf(
 			"error getting repository template update tracker file: %w",
@@ -140,6 +155,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 			ErrRepoTemplateUpdateTrackerFileDoesNotExist,
 		)
 	}
+
 	if copierConfContent == "" {
 		return ci.Finding{}, fmt.Errorf(
 			"error getting repository template update tracker file content: %w",
@@ -148,6 +164,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	}
 
 	re := regexp.MustCompile(`(?m)^_commit:\s*(.+)$`)
+
 	matches := re.FindStringSubmatch(copierConfContent)
 	if len(matches) != 2 {
 		return ci.Finding{}, fmt.Errorf(

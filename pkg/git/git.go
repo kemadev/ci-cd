@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package git
 
 import (
@@ -31,6 +34,7 @@ func GetGitBasePath() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error getting git repository: %w", err)
 	}
+
 	return GetGitBasePathWithRepo(repo)
 }
 

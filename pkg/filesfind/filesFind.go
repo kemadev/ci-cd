@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package filesfind
 
 import (
@@ -14,6 +17,7 @@ var FilesFindingRootPath = func() string {
 		slog.Error("error getting current working directory", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+
 	return wd
 }()
 

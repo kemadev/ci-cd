@@ -1,9 +1,8 @@
 /*
-ci-cd is a wrapper around CI/CD tools.
-
-It provides consitent interface to interact with different tools and platforms, as weall as default
-configuration and settings.
+Copyright 2025 kemadev
+SPDX-License-Identifier: MPL-2.0
 */
+
 package main
 
 import (
@@ -17,6 +16,7 @@ import (
 
 func main() {
 	startTime := time.Now()
+
 	config, err := config.NewConfig()
 	if err != nil {
 		slog.Error("Failed to initialize configuration", slog.String("error", err.Error()))

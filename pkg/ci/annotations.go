@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package ci
 
 import (
@@ -31,6 +34,7 @@ func PrintFindings(findings []Finding, format string) error {
 
 	if len(pfindings) == 0 {
 		slog.Info("no finding found")
+
 		return nil
 	}
 
