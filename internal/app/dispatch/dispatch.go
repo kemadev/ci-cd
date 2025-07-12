@@ -1,4 +1,3 @@
-//nolint:exhaustruct // we puprosefully avoid initializing all fields as it would be a complete mess
 package dispatch
 
 import (

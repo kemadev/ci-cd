@@ -27,7 +27,6 @@ func CheckPRTitle(title string) (ci.Finding, error) {
 	}
 
 	if !exp.MatchString(title) {
-		//nolint:exhaustruct // Position is ok being empty
 		return ci.Finding{
 			ToolName: "pr-title-checker",
 			Level:    "error",
@@ -39,6 +38,5 @@ func CheckPRTitle(title string) (ci.Finding, error) {
 
 	slog.Info("PR title is valid", slog.String("title", title))
 
-	//nolint:exhaustruct // Returning empty finding is ok
 	return ci.Finding{}, nil
 }

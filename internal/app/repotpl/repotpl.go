@@ -191,7 +191,6 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	}
 
 	if lastCommitHash != tplLastTag {
-		//nolint:exhaustruct // Position is ok being empty
 		return ci.Finding{
 			ToolName: "repo-template-updater",
 			FilePath: RepoTemplateUpdateTrackerFile,
@@ -205,6 +204,5 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		}, nil
 	}
 
-	//nolint:exhaustruct // Returning empty finding is ok
 	return ci.Finding{}, nil
 }

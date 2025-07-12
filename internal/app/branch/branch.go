@@ -132,7 +132,6 @@ func CheckStaleBranches() (ci.Finding, error) {
 			repoURL.String()+"/activity?activity_type=branch_deletion",
 		)
 
-		//nolint:exhaustruct // Position is ok being empty
 		return ci.Finding{
 			ToolName: "stale-branch-checker",
 			Level:    "error",
@@ -142,6 +141,5 @@ func CheckStaleBranches() (ci.Finding, error) {
 		}, nil
 	}
 
-	//nolint:exhaustruct // Returning empty finding is ok
 	return ci.Finding{}, nil
 }
