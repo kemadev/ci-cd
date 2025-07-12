@@ -13,8 +13,12 @@ type Config struct {
 func NewConfig() *Config {
 	var logLevel slog.Level
 
+	silentEnabled := os.Getenv("RUNNER_SILENT") == "1"
 	debugEnabled := os.Getenv("RUNNER_DEBUG") == "1"
 
+	if silentEnabled {
+		logLevel = slog.LevelError
+	}
 	if debugEnabled {
 		logLevel = slog.LevelDebug
 	} else {
