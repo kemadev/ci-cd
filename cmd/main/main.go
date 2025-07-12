@@ -17,7 +17,11 @@ import (
 
 func main() {
 	startTime := time.Now()
-	config := config.NewConfig()
+	config, err := config.NewConfig()
+	if err != nil {
+		slog.Error("Failed to initialize configuration", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
 
 	retCode, err := dispatch.DispatchCommand(config, os.Args[1:])
 	if err != nil {
