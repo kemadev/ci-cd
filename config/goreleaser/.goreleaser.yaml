@@ -124,6 +124,8 @@ dockers:
     ids:
       - default
     dockerfile: build/Dockerfile
+    extra_files:
+      - config/air/.air-hot.toml
     build_flag_templates:
       - '--pull'
       - '--secret=id=gitcreds,src=/tmp/gitcreds'
@@ -141,6 +143,8 @@ dockers:
     ids:
       - default
     dockerfile: build/Dockerfile
+    extra_files:
+      - config/air/.air-hot.toml
     build_flag_templates:
       - '--pull'
       - '--secret=id=gitcreds,src=/tmp/gitcreds'
