@@ -169,7 +169,7 @@ linters:
     # Checks that errors returned from external packages are wrapped.
     - wrapcheck
     # Add or remove empty lines.
-    - wsl
+    - wsl_v5
 
   settings:
     cyclop:
