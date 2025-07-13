@@ -1041,7 +1041,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		waitGroup.Wait()
 
 		if len(failedCommands) > 0 {
-			return goRc, fmt.Errorf(
+			return 1, fmt.Errorf(
 				"one or more commands failed: %s: %w",
 				strings.Join(failedCommands, ", "),
 				ErrCommandFailed,
