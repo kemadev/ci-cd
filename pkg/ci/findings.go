@@ -361,6 +361,58 @@ func applyValueTransformerRegex(val, regex string) (string, error) {
 	return m[1], nil
 }
 
+func computeValueWithoutOverride(
+	jsonTargetKey map[string]any,
+	mapInfo JSONMappingInfo,
+	field *string,
+) error {
+	switch val := jsonTargetKey[mapInfo.Key].(type) {
+	case nil:
+		slog.Debug("key not found in json", slog.String("key", mapInfo.Key), slog.Any("json", jsonTargetKey))
+
+		return nil
+	case string:
+		*field = val
+	case int:
+		*field = strconv.Itoa(val)
+	case float64:
+		*field = strconv.Itoa(int(val))
+	case bool:
+		if val {
+			*field = "true"
+		} else {
+			*field = "false"
+		}
+	case []any:
+		// Perform aggregation
+		var values []string
+
+		for _, v := range val {
+			str, ok := v.(string)
+			if !ok {
+				return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
+			}
+
+			values = append(values, str)
+		}
+
+		*field = strings.Join(values, " - ")
+	case any:
+		*field = fmt.Sprintf("%v", val)
+	default:
+		return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
+	}
+
+	transformedVal, err := applyValueTransformerRegex(*field, mapInfo.ValueTransformerRegex)
+	if err != nil {
+		return err
+	}
+
+	*field = transformedVal
+
+	return nil
+}
+
 func setStringValue(
 	jsonTargetKey map[string]any,
 	jsonm map[string]any,
@@ -370,48 +422,10 @@ func setStringValue(
 	*field = getDefaultStringValue(mapInfo, mapInfo.DefaultValue)
 
 	if mapInfo.OverrideValue == "" {
-		switch val := jsonTargetKey[mapInfo.Key].(type) {
-		case nil:
-			slog.Debug("key not found in json", slog.String("key", mapInfo.Key), slog.Any("json", jsonTargetKey))
-
-			return nil
-		case string:
-			*field = val
-		case int:
-			*field = strconv.Itoa(val)
-		case float64:
-			*field = strconv.Itoa(int(val))
-		case bool:
-			if val {
-				*field = "true"
-			} else {
-				*field = "false"
-			}
-		case []any:
-			// Perform aggregation
-			var values []string
-
-			for _, v := range val {
-				if str, ok := v.(string); ok {
-					values = append(values, str)
-				} else {
-					return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
-				}
-			}
-
-			*field = strings.Join(values, " - ")
-		case any:
-			*field = fmt.Sprintf("%v", val)
-		default:
-			return fmt.Errorf("error converting %s to string: %w", mapInfo.Key, ErrCantConvertToString)
-		}
-
-		transformedVal, err := applyValueTransformerRegex(*field, mapInfo.ValueTransformerRegex)
+		err := computeValueWithoutOverride(jsonTargetKey, mapInfo, field)
 		if err != nil {
-			return err
+			return fmt.Errorf("error computing value without override: %w", err)
 		}
-
-		*field = transformedVal
 	}
 
 	if mapInfo.Suffix != nil {

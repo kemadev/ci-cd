@@ -9,9 +9,11 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
+	"github.com/go-git/go-git/v6/plumbing/storer"
 	"github.com/kemadev/ci-cd/pkg/ci"
-	"github.com/kemadev/ci-cd/pkg/git"
+	kgit "github.com/kemadev/ci-cd/pkg/git"
 )
 
 var (
@@ -32,36 +34,14 @@ type StaleBranch struct {
 }
 
 func CheckStaleBranches() (ci.Finding, error) {
-	repo, err := git.GetGitRepo()
+	repo, branches, currentBranch, err := getVcsObjects()
 	if err != nil {
-		return ci.Finding{}, fmt.Errorf("error getting git repository: %w", err)
-	}
-
-	if repo == nil {
-		return ci.Finding{}, ErrGitRepoNil
-	}
-
-	branches, err := repo.Branches()
-	if err != nil {
-		return ci.Finding{}, fmt.Errorf("error getting branches: %w", err)
-	}
-
-	if branches == nil {
-		return ci.Finding{}, ErrBranchesNil
-	}
-
-	currentBranch, err := repo.Head()
-	if err != nil {
-		return ci.Finding{}, fmt.Errorf("error getting current branch: %w", err)
-	}
-
-	if currentBranch == nil {
-		return ci.Finding{}, ErrCurrBrancheNil
+		return ci.Finding{}, fmt.Errorf("error getting VCS objects: %w", err)
 	}
 
 	var staleBranches []StaleBranch
 
-	err = branches.ForEach(func(branch *plumbing.Reference) error {
+	err = (*branches).ForEach(func(branch *plumbing.Reference) error {
 		slog.Debug("checking branch", slog.String("branch", branch.Name().Short()))
 		// Branch which the workflow is running on is not considered stale
 		if branch.Name() == currentBranch.Name() {
@@ -96,50 +76,90 @@ func CheckStaleBranches() (ci.Finding, error) {
 	}
 
 	if len(staleBranches) > 0 {
-		message := "The following branches are stale: "
-
-		for i, branch := range staleBranches {
-			if i > 0 {
-				message += ", "
-			}
-
-			message += fmt.Sprintf(
-				"%s (last commit by %s on %s)",
-				branch.Name,
-				branch.LastCommitAuthor,
-				branch.LastCommitDate.Format(time.DateOnly),
-			)
-		}
-
-		remote, err := repo.Remote("origin")
+		find, err := computeFinding(repo, staleBranches)
 		if err != nil {
-			return ci.Finding{}, fmt.Errorf("error getting remote origin: %w", err)
+			return ci.Finding{}, fmt.Errorf("error computing finding: %w", err)
 		}
 
-		if remote == nil {
-			return ci.Finding{}, ErrRemoteOriginNil
-		}
-
-		repoURLString := remote.Config().URLs[0]
-
-		repoURL, err := url.Parse(repoURLString)
-		if err != nil {
-			return ci.Finding{}, fmt.Errorf("error parsing remote URL: %w", err)
-		}
-
-		message += fmt.Sprintf(
-			". Please delete these stale branches. You can view recently deleted branches (and optionally restore them) by navigating to [reposiitory activity](%s)",
-			repoURL.String()+"/activity?activity_type=branch_deletion",
-		)
-
-		return ci.Finding{
-			ToolName: "stale-branch-checker",
-			Level:    "error",
-			RuleID:   "no-stale-branch",
-			FilePath: "stale-branch",
-			Message:  message,
-		}, nil
+		return find, nil
 	}
 
 	return ci.Finding{}, nil
+}
+
+func getVcsObjects() (*git.Repository, *storer.ReferenceIter, *plumbing.Reference, error) {
+	repo, err := kgit.GetGitRepo()
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("error getting git repository: %w", err)
+	}
+
+	if repo == nil {
+		return nil, nil, nil, ErrGitRepoNil
+	}
+
+	branches, err := repo.Branches()
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("error getting branches: %w", err)
+	}
+
+	if branches == nil {
+		return nil, nil, nil, ErrBranchesNil
+	}
+
+	currentBranch, err := repo.Head()
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("error getting current branch: %w", err)
+	}
+
+	if currentBranch == nil {
+		return nil, nil, nil, ErrCurrBrancheNil
+	}
+
+	return repo, &branches, currentBranch, nil
+}
+
+func computeFinding(repo *git.Repository, staleBranches []StaleBranch) (ci.Finding, error) {
+	message := "The following branches are stale: "
+
+	for i, branch := range staleBranches {
+		if i > 0 {
+			message += ", "
+		}
+
+		message += fmt.Sprintf(
+			"%s (last commit by %s on %s)",
+			branch.Name,
+			branch.LastCommitAuthor,
+			branch.LastCommitDate.Format(time.DateOnly),
+		)
+	}
+
+	remote, err := repo.Remote("origin")
+	if err != nil {
+		return ci.Finding{}, fmt.Errorf("error getting remote origin: %w", err)
+	}
+
+	if remote == nil {
+		return ci.Finding{}, ErrRemoteOriginNil
+	}
+
+	repoURLString := remote.Config().URLs[0]
+
+	repoURL, err := url.Parse(repoURLString)
+	if err != nil {
+		return ci.Finding{}, fmt.Errorf("error parsing remote URL: %w", err)
+	}
+
+	message += fmt.Sprintf(
+		". Please delete these stale branches. You can view recently deleted branches (and optionally restore them) by navigating to [reposiitory activity](%s)",
+		repoURL.String()+"/activity?activity_type=branch_deletion",
+	)
+
+	return ci.Finding{
+		ToolName: "stale-branch-checker",
+		Level:    "error",
+		RuleID:   "no-stale-branch",
+		FilePath: "stale-branch",
+		Message:  message,
+	}, nil
 }

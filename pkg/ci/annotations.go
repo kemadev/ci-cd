@@ -18,8 +18,44 @@ var (
 	ErrInvalidFormat = fmt.Errorf("invalid format")
 )
 
+func printFindingsGithub(findings []*Finding) {
+	for _, annotation := range findings {
+		githubAnnotation := fmt.Sprintf(
+			"::%s title=%s,file=%s",
+			annotation.Level,
+			annotation.ToolName,
+			annotation.FilePath,
+		)
+
+		if annotation.StartLine > 0 {
+			githubAnnotation += fmt.Sprintf(",line=%d", annotation.StartLine)
+		}
+
+		if annotation.EndLine > annotation.StartLine {
+			githubAnnotation += fmt.Sprintf(",endLine=%d", annotation.EndLine)
+		}
+
+		if annotation.StartCol > 0 {
+			githubAnnotation += fmt.Sprintf(",col=%d", annotation.StartCol)
+		}
+
+		if annotation.EndCol > annotation.StartCol {
+			githubAnnotation += fmt.Sprintf(",endColumn=%d", annotation.EndCol)
+		}
+
+		quotedMessage := strconv.Quote(annotation.Message)
+		escapedMessage := quotedMessage[1 : len(quotedMessage)-1]
+		githubAnnotation += "::" + escapedMessage
+
+		fmt.Println(githubAnnotation)
+	}
+}
+
 func PrintFindings(findings []Finding, format string) error {
-	cwd := os.Getenv("PWD")
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("error getting current working directory: %w", err)
+	}
 
 	var pfindings []*Finding
 	for i := range findings {
@@ -27,7 +63,7 @@ func PrintFindings(findings []Finding, format string) error {
 		pfindings[i].FilePath = strings.TrimPrefix(pfindings[i].FilePath, cwd+"/")
 	}
 
-	err := validateFindings(pfindings)
+	err = validateFindings(pfindings)
 	if err != nil {
 		return fmt.Errorf("error validating findings: %w", err)
 	}
@@ -62,36 +98,7 @@ func PrintFindings(findings []Finding, format string) error {
 
 		fmt.Println(string(output))
 	case "github":
-		for _, annotation := range pfindings {
-			githubAnnotation := fmt.Sprintf(
-				"::%s title=%s,file=%s",
-				annotation.Level,
-				annotation.ToolName,
-				annotation.FilePath,
-			)
-
-			if annotation.StartLine > 0 {
-				githubAnnotation += fmt.Sprintf(",line=%d", annotation.StartLine)
-			}
-
-			if annotation.EndLine > annotation.StartLine {
-				githubAnnotation += fmt.Sprintf(",endLine=%d", annotation.EndLine)
-			}
-
-			if annotation.StartCol > 0 {
-				githubAnnotation += fmt.Sprintf(",col=%d", annotation.StartCol)
-			}
-
-			if annotation.EndCol > annotation.StartCol {
-				githubAnnotation += fmt.Sprintf(",endColumn=%d", annotation.EndCol)
-			}
-
-			quotedMessage := strconv.Quote(annotation.Message)
-			escapedMessage := quotedMessage[1 : len(quotedMessage)-1]
-			githubAnnotation += "::" + escapedMessage
-
-			fmt.Println(githubAnnotation)
-		}
+		printFindingsGithub(pfindings)
 	default:
 		return fmt.Errorf("unknown output format %s: %w", format, ErrInvalidFormat)
 	}

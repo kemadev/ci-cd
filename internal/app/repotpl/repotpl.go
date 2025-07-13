@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"strconv"
 	"strings"
 
+	"github.com/go-git/go-git/v6/plumbing/storer"
 	"github.com/kemadev/ci-cd/pkg/ci"
 	kg "github.com/kemadev/ci-cd/pkg/git"
 )
@@ -32,6 +34,104 @@ const (
 	DayBeforeStale                = 30
 )
 
+func compareTagParts(tag, compareTag string) (string, error) {
+	finalTag := tag
+
+	// v1.2.3 format
+	expectedPartsNumber := 3
+
+	tagParts := strings.Split(tag, ".")
+	if len(tagParts) != expectedPartsNumber {
+		return "", fmt.Errorf(
+			"tag %s: expected format vX.Y.Z: %w",
+			tag,
+			ErrGitTagsMalformed,
+		)
+	}
+
+	compareTagParts := strings.Split(compareTag, ".")
+	if tag != "" && len(compareTagParts) != expectedPartsNumber {
+		return "", fmt.Errorf(
+			"tag %s: expected format vX.Y.Z: %w",
+			tag,
+			ErrGitTagsMalformed,
+		)
+	}
+
+	if tag == "" {
+		return compareTag, nil
+	}
+
+	for part := range expectedPartsNumber {
+		tagPart, err := strconv.Atoi(tagParts[part])
+		if err != nil {
+			return "", fmt.Errorf(
+				"tag %s: error converting tag part %s to int: %w",
+				tag,
+				tagParts[part],
+				err,
+			)
+		}
+
+		compareTagPart, err := strconv.Atoi(compareTagParts[part])
+		if err != nil {
+			return "", fmt.Errorf(
+				"tag %s: error converting compare tag part %s to int: %w",
+				tag,
+				compareTagParts[part],
+				err,
+			)
+		}
+
+		if tagPart == compareTagPart {
+			continue
+		}
+
+		if tagPart < compareTagPart {
+			finalTag = compareTag
+
+			break
+		}
+
+		if tagPart > compareTagPart {
+			finalTag = tag
+
+			break
+		}
+	}
+
+	return finalTag, nil
+}
+
+func getLastTag(tags storer.ReferenceIter) (string, error) {
+	var tag string
+
+	semverRegex := regexp.MustCompile(`^v\d+\.\d+\.\d+$`)
+
+	for {
+		tplTag, err := tags.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		} else if err != nil {
+			return "", fmt.Errorf("error iterating repository tags: %w", err)
+		}
+
+		if tplTag == nil {
+			break
+		}
+
+		tagName := tplTag.Name().Short()
+		if semverRegex.MatchString(tagName) {
+			tag, err = compareTagParts(tag, tagName)
+			if err != nil {
+				return "", fmt.Errorf("error comparing tag parts: %w", err)
+			}
+		}
+	}
+
+	return tag, nil
+}
+
 func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	tplRepo, err := kg.GetRemoteGitRepo(
 		"https://github.com/kemadev/repo-template",
@@ -53,90 +153,14 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		return ci.Finding{}, fmt.Errorf("error getting repository tags: %w", ErrGitTagsNil)
 	}
 
-	tplLastTag := ""
-	semverRegex := regexp.MustCompile(`^v\d+\.\d+\.\d+$`)
-
-	for {
-		tplTag, err := tplTags.Next()
-		if errors.Is(err, io.EOF) {
-			break
-		} else if err != nil {
-			return ci.Finding{}, fmt.Errorf("error iterating repository tags: %w", err)
-		}
-
-		if tplTag == nil {
-			break
-		}
-
-		// v1.2.3 format
-		expectedPartsNumber := 3
-
-		tagName := tplTag.Name().Short()
-		if semverRegex.MatchString(tagName) {
-			tagParts := strings.Split(tagName, ".")
-			if len(tagParts) != expectedPartsNumber {
-				return ci.Finding{}, fmt.Errorf(
-					"tag %s: expected format vX.Y.Z: %w",
-					tagName,
-					ErrGitTagsMalformed,
-				)
-			}
-
-			lastTagParts := strings.Split(tplLastTag, ".")
-			if tplLastTag != "" && len(lastTagParts) != expectedPartsNumber {
-				return ci.Finding{}, fmt.Errorf(
-					"tag %s: expected format vX.Y.Z: %w",
-					tagName,
-					ErrGitTagsMalformed,
-				)
-			}
-
-			if tplLastTag == "" || (tagParts[0] > lastTagParts[0] ||
-				(tagParts[0] == lastTagParts[0] && tagParts[1] > lastTagParts[1]) ||
-				(tagParts[0] == lastTagParts[0] && tagParts[1] == lastTagParts[1] && tagParts[2] > lastTagParts[2])) {
-				tplLastTag = tagName
-			}
-		}
-	}
-
-	repo, err := kg.GetGitRepo()
+	tplLastTag, err := getLastTag(tplTags)
 	if err != nil {
-		return ci.Finding{}, fmt.Errorf("error getting git repository: %w", err)
+		return ci.Finding{}, fmt.Errorf("error getting last tag: %w", err)
 	}
 
-	if repo == nil {
-		return ci.Finding{}, ErrGitRepoNil
-	}
-
-	head, err := repo.Head()
-	if err != nil {
-		return ci.Finding{}, fmt.Errorf("error getting repository head: %w", err)
-	}
-
-	if head == nil {
-		return ci.Finding{}, fmt.Errorf("error getting repository head: %w", ErrGitHeadNil)
-	}
-
-	// Get the commit object
-	commit, err := repo.CommitObject(head.Hash())
-	if err != nil {
-		return ci.Finding{}, fmt.Errorf("error getting repository commit: %w", err)
-	}
-
-	if commit == nil {
-		return ci.Finding{}, fmt.Errorf("error getting repository commit: %w", ErrGitHeadNil)
-	}
-
-	tree, err := commit.Tree()
+	tree, err := kg.GetGitHeadTree()
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting repository tree: %w", err)
-	}
-
-	if tree == nil {
-		return ci.Finding{}, fmt.Errorf(
-			"error getting repository tree: %w",
-			ErrRepoTemplateUpdateTrackerFileDoesNotExist,
-		)
 	}
 
 	copierConfFile, err := tree.File(RepoTemplateUpdateTrackerFile)
@@ -182,15 +206,15 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		)
 	}
 
-	lastCommitHash := matches[1]
-	if lastCommitHash == "" {
+	lastCommitRef := matches[1]
+	if lastCommitRef == "" {
 		return ci.Finding{}, fmt.Errorf(
 			"error parsing repository template update tracker file: %w",
 			ErrRepoTemplateUpdateTrackerFileNoCommit,
 		)
 	}
 
-	if lastCommitHash != tplLastTag {
+	if lastCommitRef != tplLastTag {
 		return ci.Finding{
 			ToolName: "repo-template-updater",
 			FilePath: RepoTemplateUpdateTrackerFile,
@@ -199,7 +223,7 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 			Message: fmt.Sprintf(
 				"New version of repository template is available (%s available, actually got %s). Please update the repository template to ensure you have the latest features and fixes.",
 				tplLastTag,
-				lastCommitHash,
+				lastCommitRef,
 			),
 		}, nil
 	}
