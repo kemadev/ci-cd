@@ -119,8 +119,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandDocker+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandDocker+": %w", err)
+		return retCode, nil
 
 	case CommandGHA:
 		slog.Info("running " + CommandGHA)
@@ -164,8 +167,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandGHA+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandGHA+": %w", err)
+		return retCode, nil
 
 	case CommandSecrets:
 		slog.Info("running " + CommandSecrets)
@@ -219,8 +225,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandSecrets+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandSecrets+": %w", err)
+		return retCode, nil
 
 	case CommandSAST:
 		slog.Info("running " + CommandSAST)
@@ -284,8 +293,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandSAST+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandSAST+": %w", err)
+		return retCode, nil
 
 	case CommandGoTest:
 		slog.Info("running " + CommandGoTest)
@@ -359,7 +371,11 @@ func Run(config *config.Config, args []string) (int, error) {
 			}
 		}
 
-		return goRc, fmt.Errorf(CommandGoTest+": %w", goErr)
+		if err != nil {
+			return 1, fmt.Errorf(CommandGoTest+": %w", goErr)
+		}
+
+		return goRc, nil
 
 	case CommandGoCover:
 		slog.Info("running " + CommandGoCover)
@@ -443,8 +459,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					Type: "none",
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandGoBuild+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandGoBuild+": %w", err)
+		return retCode, nil
 
 	case CommandGoModTidy:
 		slog.Info("running " + CommandGoModTidy)
@@ -498,7 +517,11 @@ func Run(config *config.Config, args []string) (int, error) {
 			}
 		}
 
-		return goRc, fmt.Errorf(CommandGoModTidy+": %w", goErr)
+		if err != nil {
+			return 1, fmt.Errorf(CommandGoModTidy+": %w", goErr)
+		}
+
+		return goRc, nil
 
 	case CommandGoModName:
 		slog.Info("running " + CommandGoModName)
@@ -619,8 +642,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandGoLint+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandGoLint+": %w", err)
+		return retCode, nil
 
 	case CommandDeps:
 		sbomFile, err := os.CreateTemp("/tmp", "sbom-*.json")
@@ -652,8 +678,12 @@ func Run(config *config.Config, args []string) (int, error) {
 					".",
 				},
 			})
-		if err != nil || retCode != 0 {
-			return retCode, fmt.Errorf(CommandDeps+": %w", err)
+		if err != nil {
+			return 1, fmt.Errorf(CommandDeps+": %w", err)
+		}
+
+		if retCode != 0 {
+			return retCode, fmt.Errorf(CommandDeps+": %w", ErrExitCodeNotZero)
 		}
 
 		slog.Info(
@@ -720,7 +750,11 @@ func Run(config *config.Config, args []string) (int, error) {
 				},
 			})
 
-		return retCode, fmt.Errorf(CommandDeps+": %w", err)
+		if err != nil {
+			return 1, fmt.Errorf(CommandDeps+": %w", err)
+		}
+
+		return retCode, nil
 
 	case CommandMarkdown:
 		slog.Info("running " + CommandMarkdown)
@@ -774,8 +808,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandMarkdown+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandMarkdown+": %w", err)
+		return retCode, nil
 
 	case CommandShell:
 		slog.Info("running " + CommandShell)
@@ -824,8 +861,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandShell+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandShell+": %w", err)
+		return retCode, nil
 
 	case CommandRelease:
 		slog.Info("running " + CommandRelease)
@@ -863,7 +903,11 @@ func Run(config *config.Config, args []string) (int, error) {
 			)
 		}
 
-		return retCode, fmt.Errorf(CommandRelease+": %w", err)
+		if err != nil {
+			return 1, fmt.Errorf(CommandRelease+": %w", err)
+		}
+
+		return retCode, nil
 
 	case CommandPRTitleCheck:
 		slog.Info("running " + CommandPRTitleCheck)
@@ -1029,8 +1073,11 @@ func Run(config *config.Config, args []string) (int, error) {
 					Type: "none",
 				},
 			})
+		if err != nil {
+			return 1, fmt.Errorf(CommandDepsBump+": %w", err)
+		}
 
-		return retCode, fmt.Errorf(CommandDepsBump+": %w", err)
+		return retCode, nil
 
 	case "help":
 		slog.Info("Available commands:")
