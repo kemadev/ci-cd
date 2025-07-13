@@ -647,6 +647,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		}
 
 		defer os.Remove(sbomFile.Name())
+
 		slog.Info(
 			"running "+CommandDeps,
 			slog.String("step", "syft"),
@@ -993,9 +994,10 @@ func Run(config *config.Config, args []string) (int, error) {
 		}
 		waitGroup.Add(len(commands))
 
-		var failedCommands []string
-
-		var failedCommandsMu sync.Mutex
+		var (
+			failedCommands   []string
+			failedCommandsMu sync.Mutex
+		)
 
 		for _, cmd := range commands {
 			slog.Info("running command", slog.String("command", cmd))
@@ -1027,7 +1029,9 @@ func Run(config *config.Config, args []string) (int, error) {
 					)
 
 					failedCommandsMu.Lock()
+
 					failedCommands = append(failedCommands, command)
+
 					failedCommandsMu.Unlock()
 				} else {
 					slog.Debug("Command succeeded", slog.String("command", command))
