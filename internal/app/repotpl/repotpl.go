@@ -132,6 +132,45 @@ func getLastTag(tags storer.ReferenceIter) (string, error) {
 	return tag, nil
 }
 
+func checkContentForUpdate(content, lastTag string) (bool, ci.Finding, error) {
+	re := regexp.MustCompile(`(?m)^_commit:\s*(.+)$`)
+
+	// The match and exactly one submatch
+	expectedMatchesNum := 2
+	matches := re.FindStringSubmatch(content)
+
+	if len(matches) != expectedMatchesNum {
+		return false, ci.Finding{}, fmt.Errorf(
+			"error parsing repository template update tracker file: %w",
+			ErrRepoTemplateUpdateTrackerFileNoCommit,
+		)
+	}
+
+	lastCommitRef := matches[1]
+	if lastCommitRef == "" {
+		return false, ci.Finding{}, fmt.Errorf(
+			"error parsing repository template update tracker file: %w",
+			ErrRepoTemplateUpdateTrackerFileNoCommit,
+		)
+	}
+
+	if lastCommitRef != lastTag {
+		return true, ci.Finding{
+			ToolName: "repo-template-updater",
+			FilePath: RepoTemplateUpdateTrackerFile,
+			Level:    "warning",
+			RuleID:   "keep-repo-template-updated",
+			Message: fmt.Sprintf(
+				"New version of repository template is available (%s available, actually got %s). Please update the repository template to ensure you have the latest features and fixes.",
+				lastTag,
+				lastCommitRef,
+			),
+		}, nil
+	}
+
+	return false, ci.Finding{}, nil
+}
+
 func CheckRepoTemplateUpdate() (ci.Finding, error) {
 	tplRepo, err := kg.GetRemoteGitRepo(
 		"https://github.com/kemadev/repo-template",
@@ -193,39 +232,13 @@ func CheckRepoTemplateUpdate() (ci.Finding, error) {
 		)
 	}
 
-	re := regexp.MustCompile(`(?m)^_commit:\s*(.+)$`)
-
-	// The match and exactly one submatch
-	expectedMatchesNum := 2
-	matches := re.FindStringSubmatch(copierConfContent)
-
-	if len(matches) != expectedMatchesNum {
-		return ci.Finding{}, fmt.Errorf(
-			"error parsing repository template update tracker file: %w",
-			ErrRepoTemplateUpdateTrackerFileNoCommit,
-		)
+	found, finding, err := checkContentForUpdate(copierConfContent, tplLastTag)
+	if err != nil {
+		return ci.Finding{}, fmt.Errorf("error checking content for update: %w", err)
 	}
 
-	lastCommitRef := matches[1]
-	if lastCommitRef == "" {
-		return ci.Finding{}, fmt.Errorf(
-			"error parsing repository template update tracker file: %w",
-			ErrRepoTemplateUpdateTrackerFileNoCommit,
-		)
-	}
-
-	if lastCommitRef != tplLastTag {
-		return ci.Finding{
-			ToolName: "repo-template-updater",
-			FilePath: RepoTemplateUpdateTrackerFile,
-			Level:    "warning",
-			RuleID:   "keep-repo-template-updated",
-			Message: fmt.Sprintf(
-				"New version of repository template is available (%s available, actually got %s). Please update the repository template to ensure you have the latest features and fixes.",
-				tplLastTag,
-				lastCommitRef,
-			),
-		}, nil
+	if found {
+		return finding, nil
 	}
 
 	return ci.Finding{}, nil

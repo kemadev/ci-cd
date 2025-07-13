@@ -1,6 +1,7 @@
 // Copyright 2025 kemadev
 // SPDX-License-Identifier: MPL-2.0
 
+//nolint:cyclop // the enormous switch is (hopefully) easily understandable for a human
 package dispatch
 
 import (
@@ -51,7 +52,7 @@ const (
 	CommandHelp              = "help"
 )
 
-//nolint:cyclop,funlen // the enormous switch is (hopefully) easily understandable for a human
+//nolint:funlen // the enormous switch is (hopefully) easily understandable for a human
 func Run(config *config.Config, args []string) (int, error) {
 	gitRepoBasePath, err := git.GetGitBasePath()
 	if err != nil {
