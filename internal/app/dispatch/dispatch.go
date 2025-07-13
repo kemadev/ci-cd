@@ -371,7 +371,7 @@ func Run(config *config.Config, args []string) (int, error) {
 			}
 		}
 
-		if err != nil {
+		if goErr != nil {
 			return 1, fmt.Errorf(CommandGoTest+": %w", goErr)
 		}
 
@@ -517,7 +517,7 @@ func Run(config *config.Config, args []string) (int, error) {
 			}
 		}
 
-		if err != nil {
+		if goErr != nil {
 			return 1, fmt.Errorf(CommandGoModTidy+": %w", goErr)
 		}
 
