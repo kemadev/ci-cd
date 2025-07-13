@@ -647,6 +647,8 @@ func Run(config *config.Config, args []string) (int, error) {
 					gitRepoBasePath,
 					"--output",
 					"spdx-json=" + sbomFile.Name(),
+					"--enrich",
+					"go",
 					".",
 				},
 			})
