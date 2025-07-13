@@ -1018,8 +1018,6 @@ func Run(config *config.Config, args []string) (int, error) {
 						slog.String("command", command),
 						slog.String("error", err.Error()),
 					)
-
-					goRc += retCode
 				}
 
 				if retCode != 0 {
@@ -1042,7 +1040,7 @@ func Run(config *config.Config, args []string) (int, error) {
 
 		waitGroup.Wait()
 
-		if goRc != 0 {
+		if len(failedCommands) > 0 {
 			return goRc, fmt.Errorf(
 				"one or more commands failed: %s: %w",
 				strings.Join(failedCommands, ", "),
