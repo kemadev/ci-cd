@@ -741,7 +741,6 @@ func Run(config *config.Config, args []string) (int, error) {
 					},
 				},
 			})
-
 		if err != nil {
 			return 1, fmt.Errorf(CommandDeps+": %w", err)
 		}
@@ -995,6 +994,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		waitGroup.Add(len(commands))
 
 		var failedCommands []string
+
 		var failedCommandsMu sync.Mutex
 
 		for _, cmd := range commands {
@@ -1004,7 +1004,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				defer waitGroup.Done()
 
 				cmdArgs := []string{command}
-				if command == "lint" && len(args) > 1 && args[1] == "--fix" {
+				if command == CommandGoLint && len(args) > 1 && args[1] == "--fix" {
 					cmdArgs = append(cmdArgs, "--fix")
 				}
 
