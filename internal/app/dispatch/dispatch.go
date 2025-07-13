@@ -371,10 +371,6 @@ func Run(config *config.Config, args []string) (int, error) {
 			}
 		}
 
-		if goErr != nil {
-			return 1, fmt.Errorf(CommandGoTest+": %w", goErr)
-		}
-
 		return goRc, nil
 
 	case CommandGoCover:
@@ -515,10 +511,6 @@ func Run(config *config.Config, args []string) (int, error) {
 			if err != nil {
 				return 1, fmt.Errorf("error running go test in %s: %w", mod, err)
 			}
-		}
-
-		if goErr != nil {
-			return 1, fmt.Errorf(CommandGoModTidy+": %w", goErr)
 		}
 
 		return goRc, nil
