@@ -14,7 +14,7 @@ main() {
 
     /app "${@}"
 
-    echo "Failure running the application, now sleeping."
+    echo "Application exited, now sleeping."
     sleep infinity
     exit 1
 }
