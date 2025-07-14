@@ -182,9 +182,9 @@ LABEL org.opencontainers.image.licenses="MPL-2.0"
 RUN go install github.com/air-verse/air@latest
 
 COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
-COPY config/air/.air-hot.toml /var/config/air/.air-hot.toml
+COPY config/air/.air.toml /var/config/air/.air.toml
 
-ENTRYPOINT ["air", "-c", "/var/config/air/.air-hot.toml"]
+ENTRYPOINT ["air", "-c", "/var/config/air/.air.toml"]
 
 FROM clean-deps AS goreleaser-hot
 
@@ -198,9 +198,9 @@ LABEL org.opencontainers.image.licenses="MPL-2.0"
 RUN go install github.com/air-verse/air@latest
 
 COPY ci-cd /usr/local/bin/kema-runner
-COPY config/air/.air-hot.toml /var/config/air/.air-hot.toml
+COPY config/air/.air.toml /var/config/air/.air.toml
 
-ENTRYPOINT ["air", "-c", "/var/config/air/.air-hot.toml"]
+ENTRYPOINT ["air", "-c", "/var/config/air/.air.toml"]
 
 FROM clean-deps AS goreleaser
 
