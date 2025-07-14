@@ -11,7 +11,7 @@ ARG PULUMI_VERSION=3.162.0
 ARG GRYPE_VERSION=v0.91.0
 ARG SYFT_VERSION=v1.22.0
 ARG GORELEASER_VERSION=v2.8.2
-ARG GO_VERSION=1.24.2
+ARG GO_VERSION=1.24.5
 
 # Use LTS version
 ARG NODEJS_VERSION=22.17.0
@@ -164,14 +164,12 @@ ARG GOARM64=v8.2
 
 ENV CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM64=${GOARM64} GOAMD64=${GOAMD64}
 
-RUN apk add --no-cache git sudo jq
-
 WORKDIR /src
 
 COPY . /src
 
 # Build and run
-ENTRYPOINT ["sh", "-c", "cp /run/secrets/git_netrc ~/.netrc && go build -o /app ./cmd/${GO_MAIN_FILE_DIR} && /app"]
+ENTRYPOINT ["/src/tool/dev/docker-entrypoint-dev.sh"]
 
 FROM clean-deps AS hot
 
