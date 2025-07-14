@@ -168,7 +168,6 @@ WORKDIR /src
 
 COPY . /src
 
-# Build and run
 ENTRYPOINT ["/src/tool/dev/docker-entrypoint-dev.sh"]
 
 FROM clean-deps AS hot

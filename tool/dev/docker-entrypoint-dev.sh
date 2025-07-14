@@ -8,12 +8,19 @@ main() {
         exit 1
     fi
 
+    if [ -z "${HOME:-}" ]; then
+        echo "HOME is not set."
+        exit 1
+    fi
+
     cp /run/secrets/netrc ~/.netrc
 
-    go build -o /app "${GO_MAIN_FILE_DIR}"
+    BUILD_TARGET_PATH="${HOME}/app"
+
+    go build -o "${BUILD_TARGET_PATH}" "${GO_MAIN_FILE_DIR}"
 
     set +e
-    /app "${@}"
+    "${BUILD_TARGET_PATH}" "${@}"
     EXIT_CODE=$?
     set -e
 
