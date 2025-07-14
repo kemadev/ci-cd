@@ -23,10 +23,10 @@ services:
     secrets:
       - netrc
     environment:
-      # IMPROVE Might want to adjust this
-      GOPRIVATE: "github.com/kema-dev/*,github.com/kemadev/*"
       GO_MAIN_FILE_DIR: ./cmd/main
     restart: no
+    # Adapt the command to your needs when developing
+    command: ""
     develop:
       watch:
         - action: sync+restart
