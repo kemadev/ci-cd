@@ -1,2 +1,15 @@
-go.work
-go.work.sum
+*
+!*/
+
+!/.gitattributes
+!/.gitignore
+!/api
+!/asset
+!/cmd
+!/go.mod
+!/go.sum
+!/internal
+!/pkg
+!/web
+
+*PURPOSE.md
