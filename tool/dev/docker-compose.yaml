@@ -5,10 +5,10 @@ networks:
     driver: bridge
 
 secrets:
-  git_netrc:
-    name: git_netrc
-    # TIP You can use `export GIT_COMPOSE_NETRC="$(echo -e "machine $(git remote get-url origin | grep -oP '.+://\K[^/]+(?=/)')\nlogin git\npassword $(gh auth token)\n")"`
-    environment: GIT_COMPOSE_NETRC
+  netrc:
+    name: netrc
+    # TIP You can use `export COMPOSE_NETRC="$(echo -e "machine $(git remote get-url origin | grep -oP '.+://\K[^/]+(?=/)')\nlogin git\npassword $(gh auth token)\n")"`
+    environment: COMPOSE_NETRC
 
 services:
   app:
@@ -21,7 +21,7 @@ services:
     networks:
       - app-main
     secrets:
-      - git_netrc
+      - netrc
     environment:
       # IMPROVE Might want to adjust this
       GOPRIVATE: "github.com/kema-dev/*,github.com/kemadev/*"
