@@ -164,9 +164,14 @@ ARG GOARM64=v8.2
 
 ENV CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM64=${GOARM64} GOAMD64=${GOAMD64}
 
-RUN go install github.com/air-verse/air@latest
+RUN apk add --no-cache git sudo jq
 
-ENTRYPOINT ["air", "-c", "config/air/.air.toml"]
+WORKDIR /src
+
+COPY . /src
+
+# Build and run
+ENTRYPOINT ["sh", "-c", "cp /run/secrets/git_netrc ~/.netrc && go build -o /app ./cmd/${GO_MAIN_FILE_DIR} && /app"]
 
 FROM clean-deps AS hot
 

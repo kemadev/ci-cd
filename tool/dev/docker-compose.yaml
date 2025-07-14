@@ -25,6 +25,7 @@ services:
     environment:
       # IMPROVE Might want to adjust this
       GOPRIVATE: "github.com/kema-dev/*,github.com/kemadev/*"
+      GO_MAIN_FILE_DIR: main
     restart: always
     develop:
       watch:
