@@ -60,6 +60,7 @@
 - Following [Learn Go with tests](https://github.com/quii/learn-go-with-tests) is encouraged
 - Following [Effective Go](https://go.dev/doc/effective_go) and [Google's styleguide](https://google.github.io/styleguide/go/) is encouraged
 - Following [locality of behaviour](https://htmx.org/essays/locality-of-behaviour/) and [principle of least astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment) is encouraged
+- Checking [Go proverbs](https://go-proverbs.github.io/) is encouraged
 - Variables, functions, methods, ... should be named in a short and descriptive way
 
 ### Project development

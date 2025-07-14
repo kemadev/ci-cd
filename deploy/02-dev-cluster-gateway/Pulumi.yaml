@@ -1,6 +1,0 @@
-name: github-com-kemadev-ci-cd-deploy-02-dev-cluster-gateway
-description: Dev cluster creation for ci-cd
-runtime: go
-config: {}
-backend:
-  url: file://./pulumi-backend

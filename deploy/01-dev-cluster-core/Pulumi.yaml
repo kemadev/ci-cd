@@ -1,6 +1,0 @@
-name: github-com-kemadev-ci-cd-deploy-01-dev-cluster-core
-description: Dev cluster creation for ci-cd
-runtime: go
-config: {}
-backend:
-  url: file://./pulumi-backend

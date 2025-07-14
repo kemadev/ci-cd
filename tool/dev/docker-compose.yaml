@@ -1,0 +1,35 @@
+name: app
+
+networks:
+  app-main:
+    driver: bridge
+
+secrets:
+  git_netrc:
+    name: git_netrc
+    # TIP You can use `export GIT_COMPOSE_NETRC="$(echo -e "machine $(git remote get-url origin | grep -oP '.+://\K[^/]+(?=/)')\nlogin git\npassword $(gh auth token)\n")"`
+    environment: GIT_COMPOSE_NETRC
+
+services:
+  app:
+    # Enable colorized output for air
+    tty: true
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+      target: dev
+    networks:
+      - app-main
+    secrets:
+      - git_netrc
+    environment:
+      # IMPROVE Might want to adjust this
+      GOPRIVATE: "github.com/kema-dev/*,github.com/kemadev/*"
+    restart: always
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: /app
+    # Close immediately and let compose restart the container without waiting for graceful shutdown
+    stop_grace_period: 0s
