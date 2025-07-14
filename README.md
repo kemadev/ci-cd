@@ -71,12 +71,8 @@
 
 #### Prerequisites
 
-- [Docker](https://github.com/docker/cli) to run applications in containers. You should configure your credentials store and credential helpers for Docker to work with your container registry
+- [Docker](https://github.com/docker/cli) & [Docker Compose](https://github.com/docker/compose) to run applications in containers. You should configure your credentials store and credential helpers for Docker to work with your container registry
 - [Go](https://github.com/golang/go) to install applications dependencies as needed
-- [Pulumi](https://github.com/pulumi/pulumi) to manage Cloud resources
-- [kind](https://github.com/kubernetes-sigs/kind) to run Kubernetes clusters locally
-- [Kubectl](https://github.com/kubernetes/kubectl) to manage Kubernetes resources (not strictly required but quite handy)
-- Very few other CLI tools such as [git](https://github.com/git/git), [bash](https://www.gnu.org/software/bash/), ... that are most likely already installed on your system
 
 #### Running the project
 
