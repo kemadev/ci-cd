@@ -30,7 +30,7 @@ services:
     develop:
       watch:
         - action: sync+restart
-          path: .
+          path: ../../
           target: /src
     # Close immediately and let compose restart the container without waiting for graceful shutdown
     stop_grace_period: 0s
