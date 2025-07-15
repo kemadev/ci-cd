@@ -177,9 +177,9 @@ USER 1000:1000
 
 RUN git config --global --add safe.directory /src
 
-COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
-
 COPY . .
+
+COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
 
 ENTRYPOINT ["/src/tool/dev/docker-entrypoint-dev.sh"]
 
