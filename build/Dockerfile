@@ -126,11 +126,11 @@ ARG GOARM64=v8.2
 
 ENV CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM64=${GOARM64} GOAMD64=${GOAMD64}
 
-RUN --mount=type=secret,id=gitcreds \
+RUN --mount=type=secret,id=netrc \
 	--mount=type=cache,target=/root/go/pkg \
 	--mount=type=bind,source=go.mod,target=go.mod \
 	--mount=type=bind,source=go.sum,target=go.sum \
-	cp /run/secrets/gitcreds /root/.netrc && \
+	cp /run/secrets/netrc /root/.netrc && \
 	go mod download -x
 
 FROM base AS build

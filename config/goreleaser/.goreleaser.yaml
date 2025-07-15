@@ -132,7 +132,7 @@ dockers:
       - config/air/.air.toml
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
+      - '--secret=id=netrc,src=/tmp/netrc'
       - '--platform=linux/amd64'
       - '--target=goreleaser-hot'
       - '--label=org.opencontainers.image.created={{ .Date }}'
@@ -151,7 +151,7 @@ dockers:
       - config/air/.air.toml
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
+      - '--secret=id=netrc,src=/tmp/netrc'
       - '--platform=linux/arm64'
       - '--target=goreleaser-hot'
       - '--label=org.opencontainers.image.created={{ .Date }}'
