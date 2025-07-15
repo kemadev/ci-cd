@@ -56,7 +56,7 @@ dockers:
     dockerfile: build/Dockerfile
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
+      - '--secret=id=netrc,src=/tmp/netrc'
       - '--platform=linux/amd64'
       - '--target=goreleaser'
       - '--label=org.opencontainers.image.created={{ .Date }}'
@@ -73,7 +73,7 @@ dockers:
     dockerfile: build/Dockerfile
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
+      - '--secret=id=netrc,src=/tmp/netrc'
       - '--platform=linux/arm64'
       - '--target=goreleaser'
       - '--label=org.opencontainers.image.created={{ .Date }}'
@@ -93,7 +93,7 @@ dockers:
       - go.mod
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
+      - '--secret=id=netrc,src=/tmp/netrc'
       - '--platform=linux/amd64'
       - '--target=dev'
       - '--label=org.opencontainers.image.created={{ .Date }}'
@@ -112,7 +112,7 @@ dockers:
       - go.mod
     build_flag_templates:
       - '--pull'
-      - '--secret=id=gitcreds,src=/tmp/gitcreds'
+      - '--secret=id=netrc,src=/tmp/netrc'
       - '--platform=linux/arm64'
       - '--target=dev'
       - '--label=org.opencontainers.image.created={{ .Date }}'

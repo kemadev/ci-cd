@@ -1,15 +1,16 @@
 *
-!*/
 
-!/.gitattributes
-!/.gitignore
-!/api
-!/asset
-!/cmd
-!/go.mod
-!/go.sum
-!/internal
-!/pkg
-!/web
+!.gitattributes
+!.gitignore
+!api
+!asset
+!cmd
+!go.mod
+!go.sum
+!internal
+!pkg
+!tool
+!web
 
-*PURPOSE.md
+*.md
+!*.go

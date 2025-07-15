@@ -45,8 +45,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GORELEASER_PAT }}
         run: |
-          echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/gitcreds"
-          cp /tmp/gitcreds "${HOME}/.netrc"
+          echo -e "machine $(git remote get-url origin | sed -E 's|(https?://)?([^/@:]+).*|\2|')\nlogin git\npassword ${GITHUB_TOKEN}\n" > "/tmp/netrc"
+          cp /tmp/netrc "${HOME}/.netrc"
       - name: Go release
         id: go-release
         env:
@@ -57,5 +57,5 @@ jobs:
         if: always()
         shell: bash
         run: |
-          rm -f /tmp/gitcreds || { echo "Git credentials file removal failed" && exit 1; }
+          rm -f /tmp/netrc || { echo "Git credentials file removal failed" && exit 1; }
           docker logout ghcr.io || { echo "Docker logout failed" && exit 1; }
