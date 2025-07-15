@@ -49,7 +49,7 @@ RUN apk add --no-cache \
 	gzip \
 	zip
 
-FROM --platform=${BUILDPLATFORM} base-deps AS misc-deps
+FROM base-deps AS misc-deps
 
 # Docker buildx ARGs
 ARG TARGETOS
@@ -72,11 +72,11 @@ COPY --link --from=dep-python /usr/local/ /usr/local/
 
 RUN pip install --no-cache-dir "semgrep==${SEMGREP_VERSION}"
 
-FROM --platform=${BUILDPLATFORM} dep-nodejs AS nodejs-deps
+FROM dep-nodejs AS nodejs-deps
 
 RUN rm -rf /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/docker-entrypoint.sh
 
-FROM --platform=${BUILDPLATFORM} base-deps AS clean-deps
+FROM base-deps AS clean-deps
 
 COPY --link --from=dep-hadolint /bin/hadolint /usr/local/bin/hadolint
 COPY --link --from=dep-actionlint /usr/local/bin/actionlint /usr/local/bin/actionlint
@@ -112,13 +112,7 @@ ENV SEMGREP_IN_DOCKER=1
 
 ENV PYTHONIOENCODING=utf8 PYTHONUNBUFFERED=1
 
-RUN mkdir -p /src && chown root:root /src && git config --global --add safe.directory /src
-
-WORKDIR /src
-
-RUN chmod 755 /usr/local/go/bin/* && chown root:root /usr/local/go/bin/*
-
-FROM --platform=${BUILDPLATFORM} clean-deps AS base
+FROM clean-deps AS base
 
 # Docker buildx ARGs
 ARG TARGETOS
@@ -137,22 +131,33 @@ RUN --mount=type=secret,id=gitcreds \
 	cp /run/secrets/gitcreds /root/.netrc && \
 	go mod download -x
 
-FROM --platform=${BUILDPLATFORM} base AS build
+FROM base AS build
+
+WORKDIR /src
 
 RUN --mount=type=cache,target=/root/go/pkg \
 	--mount=type=cache,target=/root/.cache \
 	--mount=type=bind,source=.,target=. \
 	go build -ldflags='-s -w' -o /usr/local/bin/kema-runner ./cmd/main
 
-FROM --platform=${BUILDPLATFORM} clean-deps AS clean
+FROM clean-deps AS clean
+
+WORKDIR /src
 
 ENV HOME=/home/nobody
 
-RUN mkdir -p ${HOME} && chown nobody:nobody ${HOME}
+RUN mkdir -p ${HOME} && \
+	chown nobody:nobody ${HOME} && \
+	chmod 755 /usr/local/go/bin/* && \
+	chown nobody:nobody /usr/local/go/bin/* && \
+	mkdir -p /src \
+	&& chown nobody:nobody /src
 
 USER nobody:nobody
 
-FROM clean-deps AS dev
+RUN git config --global --add safe.directory /src
+
+FROM clean AS dev
 
 # Docker buildx ARGs
 ARG TARGETOS
@@ -164,13 +169,17 @@ ARG GOARM64=v8.2
 
 ENV CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM64=${GOARM64} GOAMD64=${GOAMD64}
 
-WORKDIR /src
-
-COPY . /src
+COPY . .
 
 ENTRYPOINT ["/src/tool/dev/docker-entrypoint-dev.sh"]
 
-FROM clean-deps AS hot
+FROM clean AS hot-base
+
+RUN go install github.com/air-verse/air@latest
+
+COPY config/air/.air.toml /var/config/air/.air.toml
+
+FROM hot-base AS hot
 
 LABEL org.opencontainers.image.authors="kemadev"
 LABEL org.opencontainers.image.url="ghcr.io/kemadev/ci-cd"
@@ -178,15 +187,12 @@ LABEL org.opencontainers.image.documentation="https://github.com/kemadev/ci-cd"
 LABEL org.opencontainers.image.source="https://github.com/kemadev/ci-cd"
 LABEL org.opencontainers.image.vendor="kemadev"
 LABEL org.opencontainers.image.licenses="MPL-2.0"
-
-RUN go install github.com/air-verse/air@latest
 
 COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
-COPY config/air/.air.toml /var/config/air/.air.toml
 
 ENTRYPOINT ["air", "-c", "/var/config/air/.air.toml"]
 
-FROM clean-deps AS goreleaser-hot
+FROM hot-base AS goreleaser-hot
 
 LABEL org.opencontainers.image.authors="kemadev"
 LABEL org.opencontainers.image.url="ghcr.io/kemadev/ci-cd"
@@ -195,14 +201,11 @@ LABEL org.opencontainers.image.source="https://github.com/kemadev/ci-cd"
 LABEL org.opencontainers.image.vendor="kemadev"
 LABEL org.opencontainers.image.licenses="MPL-2.0"
 
-RUN go install github.com/air-verse/air@latest
-
 COPY ci-cd /usr/local/bin/kema-runner
-COPY config/air/.air.toml /var/config/air/.air.toml
 
 ENTRYPOINT ["air", "-c", "/var/config/air/.air.toml"]
 
-FROM clean-deps AS goreleaser
+FROM clean AS goreleaser
 
 LABEL org.opencontainers.image.authors="kemadev"
 LABEL org.opencontainers.image.url="ghcr.io/kemadev/ci-cd"
@@ -215,7 +218,7 @@ COPY ci-cd /usr/local/bin/kema-runner
 
 ENTRYPOINT ["/usr/local/bin/kema-runner"]
 
-FROM --platform=${BUILDPLATFORM} clean-deps AS runner
+FROM --platform=${BUILDPLATFORM} clean AS main
 
 LABEL org.opencontainers.image.authors="kemadev"
 LABEL org.opencontainers.image.url="ghcr.io/kemadev/ci-cd"
