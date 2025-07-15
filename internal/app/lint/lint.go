@@ -190,7 +190,12 @@ func handleLinterOutcome(
 
 	err := cmd.Wait()
 	if err != nil {
-		slog.Error("command execution failed", slog.String("error", err.Error()), slog.String("stderr", stderrBuf.String()))
+		slog.Error(
+			"command execution failed",
+			slog.String("error", err.Error()),
+			slog.String("stdout", stdoutBuf.String()),
+			slog.String("stderr", stderrBuf.String()),
+		)
 	} else {
 		slog.Info("command executed successfully")
 	}
