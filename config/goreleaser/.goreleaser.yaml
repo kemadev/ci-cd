@@ -91,6 +91,7 @@ dockers:
     dockerfile: build/Dockerfile
     extra_files:
       - go.mod
+      - go.sum
     build_flag_templates:
       - '--pull'
       - '--secret=id=netrc,src=/tmp/netrc'
@@ -110,6 +111,7 @@ dockers:
     dockerfile: build/Dockerfile
     extra_files:
       - go.mod
+      - go.sum
     build_flag_templates:
       - '--pull'
       - '--secret=id=netrc,src=/tmp/netrc'
