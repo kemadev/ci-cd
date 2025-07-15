@@ -31,7 +31,9 @@ FROM --platform=${BUILDPLATFORM} docker.io/golang:${GO_VERSION}-alpine${ALPINE_M
 FROM --platform=${BUILDPLATFORM} docker.io/node:${NODEJS_VERSION}-alpine${ALPINE_MAJOR_MINOR_VERSION} AS dep-nodejs
 FROM --platform=${BUILDPLATFORM} docker.io/python:${PYTHON_VERSION}-alpine${ALPINE_MAJOR_MINOR_VERSION} AS dep-python
 
-FROM --platform=${BUILDPLATFORM} docker.io/alpine:${ALPINE_MAJOR_MINOR_PATCH_VERSION} AS base-deps
+FROM --platform=${BUILDPLATFORM} docker.io/alpine:${ALPINE_MAJOR_MINOR_PATCH_VERSION} AS alpine-base
+
+FROM alpine-base AS base-deps
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache \
@@ -144,30 +146,38 @@ FROM clean-deps AS clean
 
 WORKDIR /src
 
-ENV HOME=/home/nobody
+ENV PATH="/home/nonroot/go/bin:/usr/local/go/bin:${PATH}"
 
-RUN mkdir -p ${HOME} && \
-	chown nobody:nobody ${HOME} && \
-	chmod 755 /usr/local/go/bin/* && \
-	chown nobody:nobody /usr/local/go/bin/* && \
-	mkdir -p /src \
-	&& chown nobody:nobody /src
+RUN adduser -D -u 1000 nonroot && \
+	mkdir -p /src && \
+	chown -R nonroot:nonroot /src && \
+	mkdir -p /go && \
+	chown -R nonroot:nonroot /go
 
-USER nobody:nobody
+USER 1000:1000
 
 RUN git config --global --add safe.directory /src
 
-FROM clean AS dev
+FROM clean-deps AS dev
 
-# Docker buildx ARGs
-ARG TARGETOS
-ARG TARGETARCH
+WORKDIR /src
 
-ARG CGO_ENABLED=0
-ARG GOAMD64=v3
-ARG GOARM64=v8.2
+ENV PATH="/home/nonroot/go/bin:/usr/local/go/bin:${PATH}"
 
-ENV CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM64=${GOARM64} GOAMD64=${GOAMD64}
+RUN apk add --no-cache git sudo && \
+	adduser -D -u 1000 nonroot && \
+	mkdir -p /src && \
+	chown -R nonroot:nonroot /src && \
+	mkdir -p /go && \
+	chown -R nonroot:nonroot /go && \
+	echo "nonroot ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/nonroot && \
+	chmod 0440 /etc/sudoers.d/nonroot
+
+USER 1000:1000
+
+RUN git config --global --add safe.directory /src
+
+COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
 
 COPY . .
 
@@ -218,7 +228,7 @@ COPY ci-cd /usr/local/bin/kema-runner
 
 ENTRYPOINT ["/usr/local/bin/kema-runner"]
 
-FROM --platform=${BUILDPLATFORM} clean AS main
+FROM clean AS main
 
 LABEL org.opencontainers.image.authors="kemadev"
 LABEL org.opencontainers.image.url="ghcr.io/kemadev/ci-cd"
