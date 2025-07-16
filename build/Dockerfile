@@ -116,6 +116,8 @@ ENV PYTHONIOENCODING=utf8 PYTHONUNBUFFERED=1
 
 FROM clean-deps AS base
 
+WORKDIR /src
+
 # Docker buildx ARGs
 ARG TARGETOS
 ARG TARGETARCH
@@ -141,6 +143,13 @@ RUN --mount=type=cache,target=/root/go/pkg \
 	--mount=type=cache,target=/root/.cache \
 	--mount=type=bind,source=.,target=. \
 	go build -ldflags='-s -w' -o /usr/local/bin/kema-runner ./cmd/main
+
+FROM base AS debug-build
+
+RUN --mount=type=cache,target=/root/go/pkg \
+	--mount=type=cache,target=/root/.cache \
+	--mount=type=bind,source=.,target=. \
+	go build -gcflags="all=-N -l" -o /usr/local/bin/app ./cmd/main
 
 FROM clean-deps AS clean
 
@@ -175,11 +184,11 @@ RUN apk add --no-cache git sudo && \
 
 USER 1000:1000
 
-RUN git config --global --add safe.directory /src
-
-COPY . .
+RUN go install github.com/go-delve/delve/cmd/dlv@latest && \
+	git config --global --add safe.directory /src
 
 COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
+COPY --link ./tool/dev/docker-entrypoint-dev.sh /src/tool/dev/docker-entrypoint-dev.sh
 
 ENTRYPOINT ["/src/tool/dev/docker-entrypoint-dev.sh"]
 
