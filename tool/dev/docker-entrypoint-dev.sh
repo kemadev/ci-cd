@@ -4,7 +4,7 @@ set -eu
 
 main() {
     set +e
-    /app "${@}"
+    kema-runner "${@}"
     EXIT_CODE=$?
     set -e
 

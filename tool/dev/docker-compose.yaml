@@ -53,3 +53,5 @@ services:
       service: app-template
     profiles:
       - dev
+    volumes:
+      - ../../:/src
