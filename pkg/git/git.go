@@ -26,6 +26,7 @@ var (
 	ErrGitTreeNil        = fmt.Errorf("git tree is nil")
 )
 
+// TODO use DI instead of global variable.
 var gitRepo *git.Repository
 
 func GetGitRepo() (*git.Repository, error) {
