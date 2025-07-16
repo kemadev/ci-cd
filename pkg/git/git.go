@@ -26,6 +26,26 @@ var (
 	ErrGitTreeNil        = fmt.Errorf("git tree is nil")
 )
 
+var gitRepo *git.Repository
+
+func GetGitRepo() (*git.Repository, error) {
+	if gitRepo != nil {
+		return gitRepo, nil
+	}
+
+	repo, err := git.PlainOpenWithOptions(
+		".",
+		&git.PlainOpenOptions{DetectDotGit: true, EnableDotGitCommonDir: false},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error opening git repository: %w", err)
+	}
+
+	gitRepo = repo
+
+	return gitRepo, nil
+}
+
 func GetGitBranches() (*storer.ReferenceIter, error) {
 	repo, err := GetGitRepo()
 	if err != nil {
@@ -129,18 +149,6 @@ func GetGitHeadTree() (*object.Tree, error) {
 	}
 
 	return tree, nil
-}
-
-func GetGitRepo() (*git.Repository, error) {
-	repo, err := git.PlainOpenWithOptions(
-		".",
-		&git.PlainOpenOptions{DetectDotGit: true, EnableDotGitCommonDir: false},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("error opening git repository: %w", err)
-	}
-
-	return repo, nil
 }
 
 func GetGitBasePath() (string, error) {
