@@ -41,7 +41,12 @@ services:
       METRICS_EXPORT_INTERVAL: -1
       TRACES_SAMPLE_RATIO: 1
     volumes:
-      - ../../:/src
+      - type: bind
+        source: ../../
+        target: /src
+        bind:
+          selinux: Z
+          create_host_path: true
     # Adapt the command to your needs when developing
     command: ""
     ports:
