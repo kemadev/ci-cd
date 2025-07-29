@@ -4,7 +4,6 @@
 package lint
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -29,11 +28,6 @@ type LinterArgs struct {
 	FailOnAtLeastOneFinding bool
 }
 
-const (
-	// NOTE read buffer size is limited, any output line (split function) larger than this will cause deadlock.
-	MaxBufferSize = 32 * 1024 * 1024 // 32MB
-)
-
 var ErrNoLinterBinary = fmt.Errorf("linter binary is required")
 
 func processPipe(
@@ -46,22 +40,16 @@ func processPipe(
 	defer wg.Done()
 
 	reader := io.TeeReader(pipe, buf)
-	scanner := bufio.NewScanner(reader)
-	// Some linters can output a lot of data, in a one-line json format, however deadlock can occur if the output line is larger than the buffer size
-	lb := make([]byte, 0, MaxBufferSize)
-	scanner.Buffer(lb, len(lb))
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		if config.DebugEnabled {
-			_, err := fmt.Fprintln(output, line)
-			if err != nil {
-				slog.Error(
-					"error writing to output",
-					slog.String("line", line),
-					slog.Any("err", err),
-				)
-			}
+	if config.DebugEnabled {
+		_, err := io.Copy(output, reader)
+		if err != nil {
+			slog.Error("error copying to output", slog.Any("err", err))
+		}
+	} else {
+		_, err := io.Copy(io.Discard, reader)
+		if err != nil {
+			slog.Error("error reading pipe", slog.Any("err", err))
 		}
 	}
 }
