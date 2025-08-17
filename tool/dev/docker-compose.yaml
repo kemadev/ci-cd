@@ -4,9 +4,6 @@ networks:
   app:
     driver: bridge
     enable_ipv6: true
-    ipam:
-       config:
-         - subnet: 2001:db8::/64
 
 secrets:
   netrc:
@@ -33,21 +30,16 @@ services:
       # Not all projects under kemadev are private, but convenient not to set all exceptions
       GOPRIVATE: "github.com/kemadev/*"
       KEMA_RUNTIME_ENVIRONMENT: dev
-      KEMA_RUNTIME_APP_NAME: go-framework
+      KEMA_RUNTIME_APP_NAME: ci-cd
       KEMA_RUNTIME_APP_VERSION: dev
       KEMA_RUNTIME_APP_NAMESPACE: whatever
-      KEMA_OBSERVABILITY_ENDPOINT_URL: http://kemadev-go-framework-jaeger-1:4317
-      # Set this to a positive value to export metrics to stdout
-      KEMA_OBSERVABILITY_METRICS_EXPORT_INTERVAL_SECONDS: -1
-    volumes:
-      - type: bind
-        source: ../../
-        target: /src
-        bind:
-          selinux: Z
-          create_host_path: true
-    # Adapt the command to your needs when developing
-    command: ""
+      KEMA_OBSERVABILITY_ENDPOINT_URL: http://kemadev-ci-cd-jaeger-1:4317
+      KEMA_CLIENT_DATABASE_CLIENT_ADDRESS: "kemadev-ci-cd-valkey-database-1:6379"
+      KEMA_CLIENT_DATABASE_PASSWORD: "dev"
+      KEMA_CLIENT_CACHE_CLIENT_ADDRESS: "kemadev-ci-cd-valkey-cache-1:6379"
+      KEMA_CLIENT_CACHE_PASSWORD: "dev"
+      # Set this to a strictly positive duration to export metrics to stdout
+      KEMA_OBSERVABILITY_METRICS_EXPORT_INTERVAL: 0s
     ports:
       - 8080:8080
     restart: always
@@ -95,43 +87,20 @@ services:
     restart: always
 
 ---
-# Provide Postgresql for SQL, enable by setting according profile
-volumes:
-  postgresql:
-    driver: local
-services:
-  postgresql:
-    image: postgres:alpine
-    profiles:
-      - never
-    environment:
-      POSTGRES_DB: dev
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev
-    volumes:
-      - postgresql:/var/lib/postgresql
-    ports:
-      - 5432:5432
-    networks:
-      - app
-    restart: always
-
-
----
 # Provide Valkey for NoSQL, enable by setting according profile
 volumes:
-  valkey:
+  valkey-database:
     driver: local
 
 services:
-  valkey:
+  valkey-database:
     image: valkey/valkey:alpine
     profiles:
-      - never
+      - dev
     environment:
       VALKEY_EXTRA_FLAGS: --protected-mode yes --requirepass dev
     volumes:
-      - valkey:/data
+      - valkey-database:/data
     ports:
       - 6379:6379
     networks:
@@ -139,50 +108,23 @@ services:
     restart: always
 
 ---
-# Provide Opensearch for search, enable by setting according profile
-networks:
-  opensearch:
-    driver: bridge
-
+# Provide Valkey for NoSQL, enable by setting according profile
 volumes:
-  opensearch:
+  valkey-cache:
     driver: local
 
 services:
-  opensearch:
+  valkey-cache:
+    image: valkey/valkey:alpine
     profiles:
-      - never
-    image: opensearchproject/opensearch:latest
+      - dev
     environment:
-      cluster.name: dev
-      node.name: kemadev-ci-cd-opensearch-1
-      discovery.seed_hosts: kemadev-ci-cd-opensearch-1
-      cluster.initial_cluster_manager_nodes: kemadev-ci-cd-opensearch-1
-      bootstrap.memory_lock: true
-      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
-      OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpenSearchDev_1
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
+      VALKEY_EXTRA_FLAGS: --protected-mode yes --requirepass dev
     volumes:
-      - opensearch:/usr/share/opensearch/data
+      - valkey-cache:/data
     ports:
-      - 9200:9200
-      - 9600:9600
+      # Note that host uses 6380 to avoid port clash
+      - 6380:6379
     networks:
-      - opensearch
       - app
-  opensearch-dashboards:
-    profiles:
-      - never
-    image: opensearchproject/opensearch-dashboards:latest
-    ports:
-      - 5601:5601
-    environment:
-      OPENSEARCH_HOSTS: '["https://kemadev-ci-cd-opensearch-1:9200"]'
-    networks:
-      - opensearch
+    restart: always
