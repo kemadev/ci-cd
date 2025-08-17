@@ -1,6 +1,6 @@
 module github.com/kemadev/ci-cd
 
-go 1.24.5
+go 1.25.0
 
 require (
 	github.com/caarlos0/svu/v3 v3.2.3
