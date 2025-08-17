@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"encoding/json/v2"
+	"encoding/json"
 )
 
 type Finding struct {

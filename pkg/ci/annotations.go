@@ -4,7 +4,7 @@
 package ci
 
 import (
-	"encoding/json/v2"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
