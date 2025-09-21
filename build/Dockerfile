@@ -190,7 +190,7 @@ RUN go install github.com/go-delve/delve/cmd/dlv@latest && \
 	git config --global --add safe.directory /src
 
 COPY --link --from=build /usr/local/bin/kema-runner /usr/local/bin/kema-runner
-COPY --link ./tool/dev/docker-entrypoint-dev.sh /usr/local/bin/docker-entrypoint-dev.sh
+COPY --link ./tool/docker-entrypoint-dev.sh /usr/local/bin/docker-entrypoint-dev.sh
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint-dev.sh"]
 
