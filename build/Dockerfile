@@ -128,7 +128,7 @@ ARG GOARM64=v8.2
 
 ENV CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM64=${GOARM64} GOAMD64=${GOAMD64}
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git && \
 	--mount=type=cache,target=/root/go/pkg \
 	--mount=type=bind,source=go.mod,target=go.mod \
 	--mount=type=bind,source=go.sum,target=go.sum \
