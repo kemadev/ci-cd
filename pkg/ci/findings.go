@@ -4,13 +4,12 @@
 package ci
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"encoding/json"
 )
 
 type Finding struct {
