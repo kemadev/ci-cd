@@ -5,6 +5,7 @@ package lint
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -123,7 +124,7 @@ func RunLinter(config *config.Config, lintArgs LinterArgs) (int, string, string,
 			Recursive:   true,
 			IgnorePaths: []string{},
 		})
-		if err != nil {
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			return 1, "", "", fmt.Errorf("error finding files: %w", err)
 		}
 
