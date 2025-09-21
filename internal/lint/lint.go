@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"sync"
 
-	"github.com/kemadev/ci-cd/internal/app/config"
+	"github.com/kemadev/ci-cd/internal/config"
 	"github.com/kemadev/ci-cd/pkg/ci"
 	"github.com/kemadev/ci-cd/pkg/filesfind"
 )

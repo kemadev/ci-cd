@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/kemadev/ci-cd/internal/app/config"
-	"github.com/kemadev/ci-cd/internal/app/dispatch"
+	"github.com/kemadev/ci-cd/internal/config"
+	"github.com/kemadev/ci-cd/internal/dispatch"
 )
 
 func main() {
