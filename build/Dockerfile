@@ -157,6 +157,8 @@ WORKDIR /src
 
 ENV PATH="/home/nonroot/go/bin:/usr/local/go/bin:${PATH}"
 
+COPY config /var/config
+
 RUN adduser -D -u 1000 nonroot && \
 	mkdir -p /src && \
 	chown -R nonroot:nonroot /src && \
@@ -195,8 +197,6 @@ ENTRYPOINT ["/usr/local/bin/docker-entrypoint-dev.sh"]
 FROM clean AS hot-base
 
 RUN go install github.com/air-verse/air@latest
-
-COPY config/air/.air.toml /var/config/air/.air.toml
 
 FROM hot-base AS goreleaser-hot
 
