@@ -90,7 +90,7 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - config/air/.air.toml
+      - config/
     build_flag_templates:
       - '--pull'
       - '--secret=id=netrc,src=/tmp/netrc'
@@ -109,7 +109,7 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - config/air/.air.toml
+      - config/
     build_flag_templates:
       - '--pull'
       - '--secret=id=netrc,src=/tmp/netrc'
