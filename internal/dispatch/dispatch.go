@@ -190,7 +190,7 @@ func Run(config *config.Config, args []string) (int, error) {
 					"--report-format",
 					"json",
 					"--gitleaks-ignore-path",
-					"config/gitleaks/.gitleaksignore",
+					"var/configgitleaks/.gitleaksignore",
 					"--report-path",
 					"-",
 				},
@@ -448,7 +448,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				CliArgs: []string{
 					"build",
 					"--config",
-					"config/goreleaser/.goreleaser.yaml",
+					"var/configgoreleaser/.goreleaser.yaml",
 					"--clean",
 					"--snapshot",
 				},
@@ -594,7 +594,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		lintArgs := []string{
 			"run",
 			"--config",
-			"config/golangci-lint/.golangci.yaml",
+			"var/configgolangci-lint/.golangci.yaml",
 			"--show-stats=false",
 			"--output.json.path",
 			"stdout",
@@ -662,7 +662,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				CliArgs: []string{
 					"scan",
 					"--config",
-					"config/syft/.syft.yaml",
+					"var/configsyft/.syft.yaml",
 					"--source-name",
 					gitRepoBasePath,
 					"--output",
@@ -692,7 +692,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				Bin: "grype",
 				CliArgs: []string{
 					"--config",
-					"config/grype/.grype.yaml",
+					"var/configgrype/.grype.yaml",
 					"--output",
 					"json",
 					sbomFile.Name(),
@@ -758,7 +758,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				Bin: "markdownlint",
 				CliArgs: []string{
 					"--config",
-					"config/markdownlint/.markdownlint.yaml",
+					"var/configmarkdownlint/.markdownlint.yaml",
 					"--json",
 				},
 				Ext: ".md",
@@ -884,7 +884,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				CliArgs: []string{
 					"release",
 					"--config",
-					"config/goreleaser/.goreleaser.yaml",
+					"var/configgoreleaser/.goreleaser.yaml",
 					"--clean",
 				},
 			})
