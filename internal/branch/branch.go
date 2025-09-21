@@ -33,7 +33,7 @@ type StaleBranch struct {
 	LastCommitAuthor string
 }
 
-func CheckStaleBranches(gitSvc *kgit.GitService) (ci.Finding, error) {
+func CheckStaleBranches(gitSvc *kgit.Service) (ci.Finding, error) {
 	repo, err := gitSvc.GetGitRepo()
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting git repo: %w", err)
