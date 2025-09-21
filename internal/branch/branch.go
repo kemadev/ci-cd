@@ -33,8 +33,13 @@ type StaleBranch struct {
 	LastCommitAuthor string
 }
 
-func CheckStaleBranches() (ci.Finding, error) {
-	repo, branches, currentBranch, err := getVcsObjects()
+func CheckStaleBranches(gitSvc *kgit.GitService) (ci.Finding, error) {
+	repo, err := gitSvc.GetGitRepo()
+	if err != nil {
+		return ci.Finding{}, fmt.Errorf("error getting git repo: %w", err)
+	}
+
+	repo, branches, currentBranch, err := getVcsObjects(repo)
 	if err != nil {
 		return ci.Finding{}, fmt.Errorf("error getting VCS objects: %w", err)
 	}
@@ -87,12 +92,9 @@ func CheckStaleBranches() (ci.Finding, error) {
 	return ci.Finding{}, nil
 }
 
-func getVcsObjects() (*git.Repository, *storer.ReferenceIter, *plumbing.Reference, error) {
-	repo, err := kgit.GetGitRepo()
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("error getting git repository: %w", err)
-	}
-
+func getVcsObjects(
+	repo *git.Repository,
+) (*git.Repository, *storer.ReferenceIter, *plumbing.Reference, error) {
 	if repo == nil {
 		return nil, nil, nil, ErrGitRepoNil
 	}

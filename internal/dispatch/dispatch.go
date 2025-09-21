@@ -52,7 +52,9 @@ const (
 
 //nolint:funlen // the enormous switch is (hopefully) easily understandable for a human
 func Run(config *config.Config, args []string) (int, error) {
-	gitRepoBasePath, err := git.GetGitBasePath()
+	gitSvc := git.NewGitService()
+
+	gitRepoBasePath, err := gitSvc.GetGitBasePath()
 	if err != nil {
 		return 1, fmt.Errorf("error getting git base path: %w", err)
 	}
@@ -862,7 +864,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandRelease)
 		slog.Info("running "+CommandRelease, slog.String("step", "tag-semver"))
 
-		skip, err := git.TagSemver()
+		skip, err := gitSvc.TagSemver()
 		if err != nil {
 			return 1, fmt.Errorf("error tagging semver: %w", err)
 		}
@@ -924,7 +926,7 @@ func Run(config *config.Config, args []string) (int, error) {
 	case CommandBranchStaleCheck:
 		slog.Info("running " + CommandBranchStaleCheck)
 
-		finding, err := branch.CheckStaleBranches()
+		finding, err := branch.CheckStaleBranches(gitSvc)
 		if err != nil {
 			return 1, fmt.Errorf("error checking stale branches: %w", err)
 		}

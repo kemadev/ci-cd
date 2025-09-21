@@ -26,12 +26,21 @@ var (
 	ErrGitTreeNil        = fmt.Errorf("git tree is nil")
 )
 
-// TODO use DI instead of global variable.
-var gitRepo *git.Repository
+type GitService struct {
+	repo *git.Repository
+}
 
-func GetGitRepo() (*git.Repository, error) {
-	if gitRepo != nil {
-		return gitRepo, nil
+func NewGitService() *GitService {
+	return &GitService{}
+}
+
+func NewGitServiceWithRepo(repo *git.Repository) *GitService {
+	return &GitService{repo: repo}
+}
+
+func (g *GitService) GetGitRepo() (*git.Repository, error) {
+	if g.repo != nil {
+		return g.repo, nil
 	}
 
 	repo, err := git.PlainOpenWithOptions(
@@ -42,13 +51,13 @@ func GetGitRepo() (*git.Repository, error) {
 		return nil, fmt.Errorf("error opening git repository: %w", err)
 	}
 
-	gitRepo = repo
+	g.repo = repo
 
-	return gitRepo, nil
+	return g.repo, nil
 }
 
-func GetGitBranches() (*storer.ReferenceIter, error) {
-	repo, err := GetGitRepo()
+func (g *GitService) GetGitBranches() (*storer.ReferenceIter, error) {
+	repo, err := g.GetGitRepo()
 	if err != nil {
 		return nil, fmt.Errorf("error getting git repository: %w", err)
 	}
@@ -69,8 +78,8 @@ func GetGitBranches() (*storer.ReferenceIter, error) {
 	return &branches, nil
 }
 
-func GetGitCurrentBranchName() (string, error) {
-	repo, err := GetGitRepo()
+func (g *GitService) GetGitCurrentBranchName() (string, error) {
+	repo, err := g.GetGitRepo()
 	if err != nil {
 		return "", fmt.Errorf("error getting git repository: %w", err)
 	}
@@ -91,8 +100,8 @@ func GetGitCurrentBranchName() (string, error) {
 	return currentBranch.Name().Short(), nil
 }
 
-func GetGitHead() (*plumbing.Reference, error) {
-	repo, err := GetGitRepo()
+func (g *GitService) GetGitHead() (*plumbing.Reference, error) {
+	repo, err := g.GetGitRepo()
 	if err != nil {
 		return nil, fmt.Errorf("error getting git repository: %w", err)
 	}
@@ -113,8 +122,8 @@ func GetGitHead() (*plumbing.Reference, error) {
 	return head, nil
 }
 
-func GetGitHeadTree() (*object.Tree, error) {
-	repo, err := GetGitRepo()
+func (g *GitService) GetGitHeadTree() (*object.Tree, error) {
+	repo, err := g.GetGitRepo()
 	if err != nil {
 		return nil, fmt.Errorf("error getting git repository: %w", err)
 	}
@@ -152,16 +161,16 @@ func GetGitHeadTree() (*object.Tree, error) {
 	return tree, nil
 }
 
-func GetGitBasePath() (string, error) {
-	repo, err := GetGitRepo()
+func (g *GitService) GetGitBasePath() (string, error) {
+	repo, err := g.GetGitRepo()
 	if err != nil {
 		return "", fmt.Errorf("error getting git repository: %w", err)
 	}
 
-	return GetGitBasePathWithRepo(repo)
+	return g.GetGitBasePathWithRepo(repo)
 }
 
-func GetGitBasePathWithRepo(repo *git.Repository) (string, error) {
+func (g *GitService) GetGitBasePathWithRepo(repo *git.Repository) (string, error) {
 	remote, err := repo.Remote("origin")
 	if err != nil {
 		return "", fmt.Errorf("error getting remote: %w", err)
@@ -178,7 +187,7 @@ func GetGitBasePathWithRepo(repo *git.Repository) (string, error) {
 	return basePath, nil
 }
 
-func TagSemver() (bool, error) {
+func (g *GitService) TagSemver() (bool, error) {
 	currentVersion, err := svu.Current()
 	if err != nil {
 		return false, fmt.Errorf("error getting current version: %w", err)
@@ -197,7 +206,7 @@ func TagSemver() (bool, error) {
 		return true, nil
 	}
 
-	repo, err := GetGitRepo()
+	repo, err := g.GetGitRepo()
 	if err != nil {
 		return false, fmt.Errorf("error getting git repository: %w", err)
 	}
@@ -217,8 +226,8 @@ func TagSemver() (bool, error) {
 	return false, nil
 }
 
-func PushTag() error {
-	repo, err := GetGitRepo()
+func (g *GitService) PushTag() error {
+	repo, err := g.GetGitRepo()
 	if err != nil {
 		return fmt.Errorf("error getting git repository: %w", err)
 	}
@@ -240,7 +249,7 @@ func PushTag() error {
 	return nil
 }
 
-func GetRemoteGitRepo(remoteURL string) (*git.Repository, error) {
+func (g *GitService) GetRemoteGitRepo(remoteURL string) (*git.Repository, error) {
 	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
 		URL: remoteURL,
 	})
