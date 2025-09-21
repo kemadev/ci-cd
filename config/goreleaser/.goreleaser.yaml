@@ -90,7 +90,14 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - config/
+      - config/syft/.syft.yaml
+      - config/markdownlint/.markdownlint.yaml
+      - config/grype/.grype.yaml
+      - config/goreleaser/.goreleaser.yaml
+      - config/golangci-lint/.golangci.yaml
+      - config/gitleaks/.gitleaksignore
+      - config/air/.air.toml
+      - config/renovate/renovate.json
     build_flag_templates:
       - '--pull'
       - '--secret=id=netrc,src=/tmp/netrc'
@@ -109,7 +116,14 @@ dockers:
       - default
     dockerfile: build/Dockerfile
     extra_files:
-      - config/
+      - config/syft/.syft.yaml
+      - config/markdownlint/.markdownlint.yaml
+      - config/grype/.grype.yaml
+      - config/goreleaser/.goreleaser.yaml
+      - config/golangci-lint/.golangci.yaml
+      - config/gitleaks/.gitleaksignore
+      - config/air/.air.toml
+      - config/renovate/renovate.json
     build_flag_templates:
       - '--pull'
       - '--secret=id=netrc,src=/tmp/netrc'
