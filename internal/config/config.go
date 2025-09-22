@@ -14,6 +14,11 @@ type Config struct {
 	Logger       *slog.Logger
 }
 
+const (
+	DefaultConfigPath = "/var/config/"
+	LocalConfigPath   = "./config/"
+)
+
 func NewConfig() (*Config, error) {
 	var logLevel slog.Level
 
@@ -53,4 +58,19 @@ func NewConfig() (*Config, error) {
 		DebugEnabled: debugEnabled,
 		Logger:       logger,
 	}, nil
+}
+
+// Select config file, priorizing local one over default one
+func SelectFile(path string) (string, error) {
+	defaultPath := DefaultConfigPath + path
+	localPath := LocalConfigPath + path
+
+	_, err := os.Stat(localPath)
+	if err != nil && !os.IsNotExist(err) {
+		return "", fmt.Errorf("error finding file: %w", err)
+	} else if os.IsNotExist(err) {
+		return defaultPath, nil
+	}
+
+	return localPath, nil
 }

@@ -51,7 +51,7 @@ const (
 )
 
 //nolint:funlen // the enormous switch is (hopefully) easily understandable for a human
-func Run(config *config.Config, args []string) (int, error) {
+func Run(conf *config.Config, args []string) (int, error) {
 	gitSvc := git.NewGitService()
 
 	gitRepoBasePath, err := gitSvc.GetGitBasePath()
@@ -86,7 +86,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandDocker)
 
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "hadolint",
 				Ext: "Dockerfile",
@@ -130,7 +130,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandGHA)
 
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "actionlint",
 				Ext: ".yaml",
@@ -177,8 +177,13 @@ func Run(config *config.Config, args []string) (int, error) {
 	case CommandSecrets:
 		slog.Info("running " + CommandSecrets)
 
+		configFile, err := config.SelectFile("gitleaks/.gitleaksignore")
+		if err != nil {
+			return 1, fmt.Errorf("error choosing config file: %w", err)
+		}
+
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "gitleaks",
 				CliArgs: []string{
@@ -190,7 +195,7 @@ func Run(config *config.Config, args []string) (int, error) {
 					"--report-format",
 					"json",
 					"--gitleaks-ignore-path",
-					"/var/config/gitleaks/.gitleaksignore",
+					configFile,
 					"--report-path",
 					"-",
 				},
@@ -236,7 +241,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandSAST)
 
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "semgrep",
 				CliArgs: []string{
@@ -312,7 +317,7 @@ func Run(config *config.Config, args []string) (int, error) {
 
 			slog.Info("running "+CommandGoTest, slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
-				config,
+				conf,
 				lint.LinterArgs{
 					Workdir: strings.Split(mod, "go.mod")[0],
 					Bin:     "go",
@@ -386,7 +391,7 @@ func Run(config *config.Config, args []string) (int, error) {
 
 			slog.Info("running "+CommandGoCover, slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
-				config,
+				conf,
 				lint.LinterArgs{
 					Workdir: strings.Split(mod, "go.mod")[0],
 					Bin:     "go",
@@ -442,7 +447,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandGoBuild)
 
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "goreleaser",
 				CliArgs: []string{
@@ -468,7 +473,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		for _, mod := range goModList {
 			slog.Info("running "+CommandGoModTidy, slog.String("mod", mod))
 			retCode, _, _, err := lint.RunLinter(
-				config,
+				conf,
 				lint.LinterArgs{
 					Workdir: strings.Split(mod, "go.mod")[0],
 					Bin:     "go",
@@ -523,7 +528,7 @@ func Run(config *config.Config, args []string) (int, error) {
 			slog.Info("running "+CommandGoModName, slog.String("mod", mod))
 			expectedGoModName := gitRepoBasePath + strings.Split(strings.Join(strings.Split(mod, filesFindRootPath)[1:], ""), "/go.mod")[0]
 			retCode, _, _, err := lint.RunLinter(
-				config,
+				conf,
 				lint.LinterArgs{
 					Workdir: strings.Split(mod, "go.mod")[0],
 					Bin:     "go",
@@ -591,10 +596,15 @@ func Run(config *config.Config, args []string) (int, error) {
 
 		slog.Info("running "+CommandGoLint, slog.Bool("fixEnabled", fixEnabled))
 
+		configFile, err := config.SelectFile("golangci-lint/.golangci.yaml")
+		if err != nil {
+			return 1, fmt.Errorf("error choosing config file: %w", err)
+		}
+
 		lintArgs := []string{
 			"run",
 			"--config",
-			"/var/config/golangci-lint/.golangci.yaml",
+			configFile,
 			"--show-stats=false",
 			"--output.json.path",
 			"stdout",
@@ -604,7 +614,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		}
 
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin:     "golangci-lint",
 				CliArgs: lintArgs,
@@ -655,14 +665,19 @@ func Run(config *config.Config, args []string) (int, error) {
 			slog.String("outputFile", sbomFile.Name()),
 		)
 
+		configFileSyft, err := config.SelectFile("syft/.syft.yaml")
+		if err != nil {
+			return 1, fmt.Errorf("error choosing config file: %w", err)
+		}
+
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "syft",
 				CliArgs: []string{
 					"scan",
 					"--config",
-					"/var/config/syft/.syft.yaml",
+					configFileSyft,
 					"--source-name",
 					gitRepoBasePath,
 					"--output",
@@ -686,13 +701,18 @@ func Run(config *config.Config, args []string) (int, error) {
 			slog.String("outputFile", sbomFile.Name()),
 		)
 
+		configFileGrype, err := config.SelectFile("grype/.grype.yaml")
+		if err != nil {
+			return 1, fmt.Errorf("error choosing config file: %w", err)
+		}
+
 		retCode, _, _, err = lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "grype",
 				CliArgs: []string{
 					"--config",
-					"/var/config/grype/.grype.yaml",
+					configFileGrype,
 					"--output",
 					"json",
 					sbomFile.Name(),
@@ -752,13 +772,18 @@ func Run(config *config.Config, args []string) (int, error) {
 	case CommandMarkdown:
 		slog.Info("running " + CommandMarkdown)
 
+		configFile, err := config.SelectFile("markdownlint/.markdownlint.yaml")
+		if err != nil {
+			return 1, fmt.Errorf("error choosing config file: %w", err)
+		}
+
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "markdownlint",
 				CliArgs: []string{
 					"--config",
-					"/var/config/markdownlint/.markdownlint.yaml",
+					configFile,
 					"--json",
 				},
 				Ext: ".md",
@@ -811,7 +836,7 @@ func Run(config *config.Config, args []string) (int, error) {
 		slog.Info("running " + CommandShell)
 
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "shellcheck",
 				CliArgs: []string{
@@ -877,14 +902,19 @@ func Run(config *config.Config, args []string) (int, error) {
 
 		slog.Info("running "+CommandRelease, slog.String("step", "goreleaser"))
 
+		configFile, err := config.SelectFile("goreleaser/.goreleaser.yaml")
+		if err != nil {
+			return 1, fmt.Errorf("error choosing config file: %w", err)
+		}
+
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin: "goreleaser",
 				CliArgs: []string{
 					"release",
 					"--config",
-					"./config/goreleaser/.goreleaser.yaml",
+					configFile,
 					"--clean",
 				},
 			})
@@ -986,7 +1016,7 @@ func Run(config *config.Config, args []string) (int, error) {
 					cmdArgs = append(cmdArgs, "--fix")
 				}
 
-				retCode, err := Run(config, cmdArgs)
+				retCode, err := Run(conf, cmdArgs)
 				if err != nil {
 					slog.Error(
 						"Error executing command",
@@ -1030,12 +1060,12 @@ func Run(config *config.Config, args []string) (int, error) {
 	case CommandDepsBump:
 		slog.Info("running " + CommandDepsBump)
 
-		if config.DebugEnabled {
+		if conf.DebugEnabled {
 			os.Setenv("LOG_LEVEL", "debug")
 		}
 
 		retCode, _, _, err := lint.RunLinter(
-			config,
+			conf,
 			lint.LinterArgs{
 				Bin:     "renovate",
 				CliArgs: []string{},
