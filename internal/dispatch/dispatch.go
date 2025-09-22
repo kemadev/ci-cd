@@ -884,7 +884,7 @@ func Run(config *config.Config, args []string) (int, error) {
 				CliArgs: []string{
 					"release",
 					"--config",
-					"/var/config/goreleaser/.goreleaser.yaml",
+					"./config/goreleaser/.goreleaser.yaml",
 					"--clean",
 				},
 			})
