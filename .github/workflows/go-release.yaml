@@ -17,7 +17,7 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kemadev/ci-cd:latest
+      image: ghcr.io/kemadev/ci-cd:0.22.1
       # GitHub Actions workaround, see https://docs.github.com/en/actions/reference/dockerfile-support-for-github-actions#user
       options: --user root:root
       credentials:
