@@ -13,7 +13,7 @@ import (
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/go-git/go-git/v6/plumbing/storer"
 	"github.com/kemadev/ci-cd/pkg/ci"
-	kgit "github.com/kemadev/ci-cd/pkg/git"
+	kgit "github.com/kemadev/go-framework/pkg/git"
 )
 
 var (

@@ -17,7 +17,7 @@ import (
 	"github.com/kemadev/ci-cd/internal/pr"
 	"github.com/kemadev/ci-cd/pkg/ci"
 	"github.com/kemadev/ci-cd/pkg/filesfind"
-	"github.com/kemadev/ci-cd/pkg/git"
+	"github.com/kemadev/go-framework/pkg/git"
 )
 
 var (
