@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+
+	"github.com/kemadev/ci-cd/internal/auth"
 )
 
 type Config struct {
@@ -24,6 +26,7 @@ func NewConfig() (*Config, error) {
 
 	silentEnabled := os.Getenv("RUNNER_SILENT") == "1"
 	debugEnabled := os.Getenv("RUNNER_DEBUG") == "1"
+	netrcEnabled := os.Getenv(auth.NetrcEnvVarKey) != ""
 
 	if debugEnabled {
 		logLevel = slog.LevelDebug
@@ -42,6 +45,13 @@ func NewConfig() (*Config, error) {
 		slogFd = devNull
 	} else {
 		slogFd = os.Stdout
+	}
+
+	if netrcEnabled {
+		err := auth.CreateNetrcFromEnv()
+		if err != nil {
+			return nil, fmt.Errorf("error creating netrc: %w", err)
+		}
 	}
 
 	logger := slog.New(
