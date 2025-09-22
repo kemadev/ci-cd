@@ -128,6 +128,7 @@ ARG GOARM64=v8.2
 
 ENV CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOARM64=${GOARM64} GOAMD64=${GOAMD64}
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache git
 
 RUN --mount=type=cache,target=/root/go/pkg \
@@ -175,6 +176,7 @@ WORKDIR /src
 
 ENV PATH="/home/nonroot/go/bin:/usr/local/go/bin:${PATH}"
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache git sudo && \
 	adduser -D -u 1000 nonroot && \
 	mkdir -p /src && \

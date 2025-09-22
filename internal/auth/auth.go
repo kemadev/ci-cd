@@ -1,3 +1,6 @@
+// Copyright 2025 kemadev
+// SPDX-License-Identifier: MPL-2.0
+
 package auth
 
 import (
@@ -8,8 +11,6 @@ import (
 	"github.com/kemadev/ci-cd/pkg/auth"
 )
 
-var NetrcFilePath = os.Getenv("HOME") + "/.netrc"
-
 var ErrNetrcNotSet = errors.New("netrc file environment variable is not set")
 
 func CreateNetrcFromEnv() error {
@@ -18,7 +19,7 @@ func CreateNetrcFromEnv() error {
 		return fmt.Errorf("error finding netrc environment variable: %w", ErrNetrcNotSet)
 	}
 
-	f, err := os.Create(NetrcFilePath)
+	f, err := os.Create(os.Getenv("HOME") + "/.netrc")
 	if err != nil {
 		return fmt.Errorf("error creating netrc file: %w", err)
 	}
