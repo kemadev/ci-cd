@@ -4,16 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
-)
 
-const NetrcEnvVarKey = "KEMA_NETRC"
+	"github.com/kemadev/ci-cd/pkg/auth"
+)
 
 var NetrcFilePath = os.Getenv("HOME") + "/.netrc"
 
 var ErrNetrcNotSet = errors.New("netrc file environment variable is not set")
 
 func CreateNetrcFromEnv() error {
-	netrcContent, present := os.LookupEnv(NetrcEnvVarKey)
+	netrcContent, present := os.LookupEnv(auth.NetrcEnvVarKey)
 	if !present {
 		return fmt.Errorf("error finding netrc environment variable: %w", ErrNetrcNotSet)
 	}

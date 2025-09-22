@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/kemadev/ci-cd/internal/auth"
+	eauth "github.com/kemadev/ci-cd/pkg/auth"
 )
 
 type Config struct {
@@ -26,7 +27,7 @@ func NewConfig() (*Config, error) {
 
 	silentEnabled := os.Getenv("RUNNER_SILENT") == "1"
 	debugEnabled := os.Getenv("RUNNER_DEBUG") == "1"
-	netrcEnabled := os.Getenv(auth.NetrcEnvVarKey) != ""
+	netrcEnabled := os.Getenv(eauth.NetrcEnvVarKey) != ""
 
 	if debugEnabled {
 		logLevel = slog.LevelDebug
