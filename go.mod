@@ -3,8 +3,8 @@ module github.com/kemadev/ci-cd
 go 1.24.7
 
 require (
-	github.com/go-git/go-git/v6 v6.0.0-20250922101824-23ffe67a3eb3
-	github.com/kemadev/go-framework v0.4.0
+	github.com/go-git/go-git/v6 v6.0.0-20250922134601-9bda2a038490
+	github.com/kemadev/go-framework v0.5.0
 )
 
 require (

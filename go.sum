@@ -36,6 +36,8 @@ github.com/go-git/go-git/v6 v6.0.0-20250921083035-edb95f36f415 h1:BSCf5WWe2zfqid
 github.com/go-git/go-git/v6 v6.0.0-20250921083035-edb95f36f415/go.mod h1:qikYwcUCOy1+Pq2SPaUmoubCmJ2PT+Lg9ti8sgwtmJg=
 github.com/go-git/go-git/v6 v6.0.0-20250922101824-23ffe67a3eb3 h1:djRCMh1oyF4jztyfrRHLO/9xsuv7SaACJamxlETq7To=
 github.com/go-git/go-git/v6 v6.0.0-20250922101824-23ffe67a3eb3/go.mod h1:qikYwcUCOy1+Pq2SPaUmoubCmJ2PT+Lg9ti8sgwtmJg=
+github.com/go-git/go-git/v6 v6.0.0-20250922134601-9bda2a038490 h1:JRD0K3x7otWuEt0rlTRQNg1sz1r6LX6CuDOmw3XlznY=
+github.com/go-git/go-git/v6 v6.0.0-20250922134601-9bda2a038490/go.mod h1:qikYwcUCOy1+Pq2SPaUmoubCmJ2PT+Lg9ti8sgwtmJg=
 github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
 github.com/gobwas/glob v0.2.3/go.mod h1:d3Ez4x06l9bZtSvzIay5+Yzi0fmZzPgnTbPcKjJAkT8=
 github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 h1:f+oWsMOmNPc8JmEHVZIycC7hBoQxHH9pNKQORJNozsQ=
@@ -46,6 +48,8 @@ github.com/kemadev/go-framework v0.3.0 h1:xqiegNXMWl1+C7G7dUgL+kd0o52jVtUNUFiBqL
 github.com/kemadev/go-framework v0.3.0/go.mod h1:tdys7tLNkHW8A3kVUmBQKuxhTOGRgP5Nk+41wLY6n9Q=
 github.com/kemadev/go-framework v0.4.0 h1:9YWIZ9aBixEO+fNnl2D2KEJvmtddKaC+CZPn4XDMIT4=
 github.com/kemadev/go-framework v0.4.0/go.mod h1:tdys7tLNkHW8A3kVUmBQKuxhTOGRgP5Nk+41wLY6n9Q=
+github.com/kemadev/go-framework v0.5.0 h1:3+0zhhqAxvapfWUPOATFQAWI/d1q6ghl7IShQPhEXJY=
+github.com/kemadev/go-framework v0.5.0/go.mod h1:tdys7tLNkHW8A3kVUmBQKuxhTOGRgP5Nk+41wLY6n9Q=
 github.com/kevinburke/ssh_config v1.4.0 h1:6xxtP5bZ2E4NF5tuQulISpTO2z8XbtH8cg1PWkxoFkQ=
 github.com/kevinburke/ssh_config v1.4.0/go.mod h1:q2RIzfka+BXARoNexmF9gkxEX7DmvbW9P4hIVx2Kg4M=
 github.com/klauspost/cpuid/v2 v2.3.0 h1:S4CRMLnYUhGeDFDqkGriYKdfoFlDnMtqTiI/sFzhA9Y=
