@@ -60,7 +60,7 @@ func NewConfig() (*Config, error) {
 	}, nil
 }
 
-// Select config file, priorizing local one over default one
+// Select config file, priorizing local one over default one.
 func SelectFile(path string) (string, error) {
 	defaultPath := DefaultConfigPath + path
 	localPath := LocalConfigPath + path
