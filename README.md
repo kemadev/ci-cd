@@ -15,4 +15,4 @@
 
 # ci-cd
 
-CI & CD pipelines, defined in a portable container thanks to Go
+CI & CD pipelines, defined in Go and packaged as a container
