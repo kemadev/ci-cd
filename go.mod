@@ -4,7 +4,7 @@ go 1.24.7
 
 require (
 	github.com/go-git/go-git/v6 v6.0.0-20250922134601-9bda2a038490
-	github.com/kemadev/go-framework v0.5.0
+	github.com/kemadev/go-framework v0.6.0
 )
 
 require (
