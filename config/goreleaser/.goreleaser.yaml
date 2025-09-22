@@ -21,17 +21,18 @@ builds:
     goamd64:
       # See https://en.wikipedia.org/wiki/X86-64#Microarchitecture_levels
       - v3
+      # - v4
     goarm64:
       # Neoverse N1 / E1 - Cortex A76 (e.g. Raspberry Pi 5)
       - v8.2
-    #   # Apple M1 - Neoverse V1
-    #   - v8.4
-    #   # Apple M2 / M3
-    #   - v8.6
-    #   # Neoverse V2 / N2 / E2
-    #   - v9.0
-    #   # Apple M4 - Neoverse V3 / N3
-    #   - v9.2
+      # Apple M1 - Neoverse V1
+      # - v8.4
+      # Apple M2 / M3
+      # - v8.6
+      # Neoverse V2 / N2 / E2
+      # - v9.0
+      # Apple M4 - Neoverse V3 / N3
+      # - v9.2
     mod_timestamp: '{{ .CommitTimestamp }}'
 
 gomod:
