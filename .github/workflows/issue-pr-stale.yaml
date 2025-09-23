@@ -1,4 +1,4 @@
-name: Housekeeping - Issues & PRs staleness housekeeping
+name: Housekeeping - Issues & PRs staleness check
 
 on:
   schedule:
@@ -22,7 +22,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Issues & PRs staleness housekeeping
+      - name: Issues & PRs staleness check
         id: issue-pr-stale-housekeep
         uses: actions/stale@v9
         with:
