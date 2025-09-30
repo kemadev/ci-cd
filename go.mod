@@ -4,7 +4,7 @@ go 1.24.7
 
 require (
 	github.com/go-git/go-git/v6 v6.0.0-20250923080731-ebc56f97b3d2
-	github.com/kemadev/go-framework v0.8.0
+	github.com/kemadev/go-framework v0.13.0
 )
 
 require (
@@ -25,7 +25,6 @@ require (
 	github.com/pjbgf/sha1cd v0.5.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	golang.org/x/crypto v0.42.0 // indirect
-	golang.org/x/exp v0.0.0-20250911091902-df9299821621 // indirect
 	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
 )
